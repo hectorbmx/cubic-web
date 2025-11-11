@@ -16,13 +16,13 @@ return new class extends Migration
             }
             
             // Índices para búsquedas (solo si no existen)
-            if (!$this->hasIndex('cliente_user', 'cliente_user_status_index')) {
-                $table->index('status');
-            }
+            // if (!$this->hasIndex('cliente_user', 'cliente_user_status_index')) {
+            //     $table->index('status');
+            // }
             
-            if (!$this->hasIndex('cliente_user', 'cliente_user_role_index')) {
-                $table->index('role');
-            }
+            // if (!$this->hasIndex('cliente_user', 'cliente_user_role_index')) {
+            //     $table->index('role');
+            // }
         });
     }
 
@@ -32,12 +32,12 @@ return new class extends Migration
             if ($this->hasIndex('cliente_user', 'cliente_user_unique')) {
                 $table->dropUnique('cliente_user_unique');
             }
-            if ($this->hasIndex('cliente_user', 'cliente_user_status_index')) {
-                $table->dropIndex(['status']);
-            }
-            if ($this->hasIndex('cliente_user', 'cliente_user_role_index')) {
-                $table->dropIndex(['role']);
-            }
+            // if ($this->hasIndex('cliente_user', 'cliente_user_status_index')) {
+            //     $table->dropIndex(['status']);
+            // }
+            // if ($this->hasIndex('cliente_user', 'cliente_user_role_index')) {
+            //     $table->dropIndex(['role']);
+            // }
         });
     }
     
