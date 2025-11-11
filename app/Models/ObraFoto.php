@@ -40,10 +40,18 @@ class ObraFoto extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
+    // public function getUrlAttribute()
+    // {
+    //     return Storage::url($this->ruta_archivo);
+    // }
     public function getUrlAttribute()
-    {
-        return Storage::url($this->ruta_archivo);
-    }
+{
+    // Obtener solo el path relativo
+    $path = str_replace('/storage', '', Storage::url($this->ruta_archivo));
+    
+    // Construir URL completa con APP_URL
+    return config('app.url') . '/storage' . $path;
+}
 
     public function deleteFile()
     {
@@ -52,4 +60,5 @@ class ObraFoto extends Model
         }
         return false;
     }
+    
 }

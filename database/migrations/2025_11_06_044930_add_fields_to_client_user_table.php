@@ -46,4 +46,4 @@ return new class extends Migration
         $indexes = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
         return !empty($indexes);
     }
-};
+};  

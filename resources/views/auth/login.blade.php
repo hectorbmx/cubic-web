@@ -368,6 +368,24 @@
                     <h2>Iniciar Sesión</h2>
                     <p>Ingresa tus credenciales para continuar</p>
                 </div>
+                @if ($errors->any())
+  <div style="
+      background:#fee2e2;
+      color:#b91c1c;
+      border:1px solid #fca5a5;
+      padding:12px 16px;
+      border-radius:8px;
+      margin-bottom:20px;
+      font-weight:600;">
+    <ul style="list-style:none; margin:0; padding:0;">
+      @foreach ($errors->all() as $error)
+        <li>⚠️ {{ $error }}</li>
+      @endforeach
+    </ul>
+  </div>
+@endif
+
+
 <form method="POST" action="{{ route('login') }}">
     @csrf
 

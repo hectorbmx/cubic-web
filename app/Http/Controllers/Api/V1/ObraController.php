@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Obra;
 use Illuminate\Http\Request;
+use App\Models\Cliente;
 
 class ObraController extends Controller
 {
@@ -150,5 +151,28 @@ class ObraController extends Controller
                 }),
             ]
         ]);
+    }
+ public function byCliente(Request $request, $clienteId)
+    {
+        $user = $request->user();
+
+    
+        $isSuperAdmin = $user?->role === 'superadmin';
+        $assignedClientIds = $user?->clientes()->pluck('clientes.id')->toArray() ?? [];
+
+        if (!$isSuperAdmin && !in_array((int)$clienteId, $assignedClientIds, true)) {
+            return response()->json([
+                'message' => 'No autorizado para ver obras de este cliente.',
+            ], 403);
+        }
+
+        $obras = Obra::query()
+            ->where('client_id', $clienteId)
+            ->latest('id')
+            ->get();
+
+        return response()->json([
+            'data' => $obras,
+        ], 200);
     }
 }

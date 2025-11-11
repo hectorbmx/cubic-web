@@ -81,8 +81,9 @@ class Cliente extends Model
             ->withTimestamps();
     }
     public function obrasCompletadas()
-{
+    {
     return $this->obras()
                 ->where('status', 'completed');
-}
+    }
+    
 }

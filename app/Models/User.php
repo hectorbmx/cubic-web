@@ -58,9 +58,9 @@ class User extends Authenticatable
     //                 ->withPivot('role')
     //                 ->withTimestamps();
     // }
-                public function obras()
+    public function obras()
     {
-        return $this->belongsToMany(Obra::class, 'obra_user')
+        return $this->belongsToMany(Obra::class, 'obra_user','user_id','obra_id')
                     ->withPivot('role')
                     ->withTimestamps();
     }

@@ -653,9 +653,9 @@
                         <label class="form-label text-dark">🔑 Rol del usuario en las obras seleccionadas</label>
                         <select name="role" required class="form-control text-dark">
                             <option value="">Seleccionar rol...</option>
-                            <option value="company_admin">Administrador (acceso total)</option>
-                            <option value="gestor">Gestor (puede editar)</option>
-                            <option value="viewer">Visualizador (solo lectura)</option>
+                            <option value="manager">Administrador (acceso total)</option>
+                            <option value="residente">Gestor (puede editar)</option>
+                            <option value="viewer_obra">Visualizador (solo lectura)</option>
                         </select>
                         <small style="color: #6b7280; font-size: 13px; margin-top: 0.5rem; display: block;">
                             El rol determina los permisos del usuario en las obras

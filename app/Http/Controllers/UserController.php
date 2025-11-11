@@ -43,38 +43,65 @@ public function obras(User $user)
     /**
  * Asigna obras a un usuario
  */
+// public function asignarObras(Request $request, User $user)
+// {
+//     $request->validate([
+//         'obras' => 'required|array|min:1',
+//         'obras.*' => 'exists:obras,id',
+//         'role' => 'required|in:company_admin,gestor,viewer',
+//     ]);
+
+//     try {
+//         foreach ($request->obras as $obraId) {
+//             // Verificar si ya está asignado
+//             $exists = $user->obras()->where('obra_id', $obraId)->exists();
+            
+//             if (!$exists) {
+//                 // Asignar usuario a la obra
+//                 $user->obras()->attach($obraId, [
+//                     'role' => $request->role,
+//                     // 'status' => 'active',
+//                     'created_at' => now(),
+//                     'updated_at' => now(),
+//                 ]);
+//             }
+//         }
+
+//         return redirect()
+//             ->back()
+//             ->with('success', 'Usuario asignado a las obras correctamente.');
+
+//     } catch (\Exception $e) {
+//         return redirect()
+//             ->back()
+//             ->with('error', 'Error al asignar obras: ' . $e->getMessage());
+//     }
+// }
 public function asignarObras(Request $request, User $user)
 {
     $request->validate([
-        'obras' => 'required|array|min:1',
-        'obras.*' => 'exists:obras,id',
-        'role' => 'required|in:company_admin,gestor,viewer',
+        'obras'    => ['required','array','min:1'],
+        'obras.*'  => ['exists:obras,id'],
+        'role'     => ['required','in:manager,residente,viewer_obra'],
     ]);
 
     try {
+        // 1) Insertar sin duplicar
+        $payload = collect($request->obras)->mapWithKeys(function ($obraId) use ($request) {
+            return [$obraId => ['role' => $request->role]];
+        })->all();
+
+        $user->obras()->syncWithoutDetaching($payload);
+
+        // 2) (Opcional) Si ya estaba asignado, actualiza el rol
         foreach ($request->obras as $obraId) {
-            // Verificar si ya está asignado
-            $exists = $user->obras()->where('obra_id', $obraId)->exists();
-            
-            if (!$exists) {
-                // Asignar usuario a la obra
-                $user->obras()->attach($obraId, [
-                    'role' => $request->role,
-                    // 'status' => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            $user->obras()->updateExistingPivot($obraId, ['role' => $request->role]);
         }
 
-        return redirect()
-            ->back()
-            ->with('success', 'Usuario asignado a las obras correctamente.');
-
-    } catch (\Exception $e) {
-        return redirect()
-            ->back()
-            ->with('error', 'Error al asignar obras: ' . $e->getMessage());
+        return back()->with('success', 'Usuario asignado/actualizado en las obras correctamente.');
+    } catch (\Throwable $e) {
+        return back()->with('error', 'Error al asignar obras: '.$e->getMessage());
     }
 }
+
 }
