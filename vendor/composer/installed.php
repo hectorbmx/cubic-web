@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '5d35c3660907c714f1c87109b70c1862b3bb71c2',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -268,6 +268,15 @@
                 0 => 'v10.49.1',
             ),
         ),
+        'illuminate/json-schema' => array(
+            'pretty_version' => 'v12.37.0',
+            'version' => '12.37.0.0',
+            'reference' => 'c2b383a6dd66f41208f1443801fe01934c63d030',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../illuminate/json-schema',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'illuminate/log' => array(
             'dev_requirement' => false,
             'replaced' => array(
@@ -370,6 +379,15 @@
                 0 => '*',
             ),
         ),
+        'laravel/boost' => array(
+            'pretty_version' => 'v1.8.0',
+            'version' => '1.8.0.0',
+            'reference' => '3475be16be7552b11c57ce18a0c5e204d696da50',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/boost',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'laravel/breeze' => array(
             'pretty_version' => 'v1.29.1',
             'version' => '1.29.1.0',
@@ -389,13 +407,22 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '5d35c3660907c714f1c87109b70c1862b3bb71c2',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'laravel/mcp' => array(
+            'pretty_version' => 'v0.3.2',
+            'version' => '0.3.2.0',
+            'reference' => 'dc722a4c388f172365dec70461f0413ac366f360',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/mcp',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'laravel/pint' => array(
             'pretty_version' => 'v1.25.1',
@@ -414,6 +441,15 @@
             'install_path' => __DIR__ . '/../laravel/prompts',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'laravel/roster' => array(
+            'pretty_version' => 'v0.2.9',
+            'version' => '0.2.9.0',
+            'reference' => '82bbd0e2de614906811aebdf16b4305956816fa6',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/roster',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'laravel/sail' => array(
             'pretty_version' => 'v1.47.0',
@@ -766,8 +802,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '3.0.0',
-                1 => '1.0|2.0|3.0',
+                0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'psr/simple-cache' => array(
