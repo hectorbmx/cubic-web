@@ -70,9 +70,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $this->command->info('Roles y permisos creados exitosamente!');
 
-        // Opcional: Crear un usuario superadmin de prueba
-        // Descomenta si necesitas crear un usuario inicial
-        /*
+        // Crear un usuario superadmin de prueba
         $superadminUser = User::firstOrCreate(
             ['email' => 'superadmin@example.com'],
             [
@@ -85,6 +83,5 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $superadminUser->assignRole('superadmin');
         $this->command->info('Usuario superadmin creado: superadmin@example.com / password');
-        */
     }
 }
