@@ -436,7 +436,7 @@
     <button type="submit" class="btn-login">Iniciar Sesión</button>
 
     <div class="footer-text">
-        ¿No tienes cuenta? <a href="#">Contacta al administrador</a>
+        ¿Eres nuevo? <a href="{{ route('new-register') }}">Registra tu contreña</a>
     </div>
 </form>
 

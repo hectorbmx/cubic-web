@@ -76,7 +76,7 @@ class Cliente extends Model
     public function users()
     {
         // tabla pivot: cliente_user
-        return $this->belongsToMany(User::class, 'cliente_user')
+        return $this->belongsToMany(User::class, 'cliente_user','cliente_id','user_id')
             ->withPivot(['role', 'status', 'invited_at', 'invited_by_user_id'])
             ->withTimestamps();
     }
@@ -85,5 +85,13 @@ class Cliente extends Model
     return $this->obras()
                 ->where('status', 'completed');
     }
+    public function scopeVisibleFor($query, \App\Models\User $user)
+    {
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return $query;
+        }
+        return $query->whereHas('users', fn($q) => $q->whereKey($user->id));
+    }
+
     
 }

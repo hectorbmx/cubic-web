@@ -21,8 +21,12 @@ class ClienteController extends Controller
    public function index(Request $request)
 {
     $user = Auth::user();
-
     // Query base con conteo de obras
+    $clientes = \App\Models\Cliente::visibleFor(auth()->user())
+    ->withCount('obras')
+    ->latest()
+    ->get();
+
     $query = Cliente::withCount([
         'obras as obras_activas_count' => function($query) {
             $query->whereIn('status', ['planning', 'in_progress']);

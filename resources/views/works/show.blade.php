@@ -1,5 +1,82 @@
 <x-app-layout>
     <style>
+        /* Layout horizontal tipo grid para el editor */
+#edit-persona-wrapper .edit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+/* Por si el contenedor padre pone el texto blanco */
+#edit-persona-wrapper,
+#edit-persona-wrapper label,
+#edit-persona-wrapper input {
+    color: #111827 !important; /* gris muy oscuro */
+}
+
+#edit-persona-wrapper input.form-input {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+}
+
+/* Que no quede pegado a la izquierda en pantallas pequeñas */
+@media (max-width: 768px) {
+    #edit-persona-wrapper .edit-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+        .table td,
+        .table th {
+            color: #020101ff !important;
+        }
+        /* Estilos SOLO para la tabla del directorio */
+#tabla-personas {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px; /* separa filas */
+    font-size: 15px;
+}
+
+#tabla-personas thead th {
+    background: #f1f5f9; /* gris clarito */
+    color: #1f2937;      /* gris oscuro */
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#tabla-personas tbody tr {
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+#tabla-personas tbody td {
+    padding: 12px 16px;
+    color: #1e293b; /* negro suave */
+}
+
+/* Hover */
+#tabla-personas tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* Botón de eliminar */
+#tabla-personas .btn-delete-persona {
+    font-size: 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #ef4444; /* rojo suave */
+    transition: 0.2s;
+}
+
+#tabla-personas .btn-delete-persona:hover {
+    transform: scale(1.2);
+    color: #dc2626;
+}
+
+        
         .obra-show-container {
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #f5f7fa;
@@ -480,6 +557,7 @@
                         <button class="tab-button" onclick="switchTab(event, 'contratos')">📄 Contratos</button>
                         <button class="tab-button" onclick="switchTab(event, 'informes')">📊 Informes</button>
                         <button class="tab-button" onclick="switchTab(event, 'fotos')">📷 Fotos</button>
+                        <button class="tab-button" onclick="switchTab(event, 'directorio')">📋 Directorio</button>
                     </div>
 
                     {{-- Tab: Información General --}}
@@ -1085,7 +1163,6 @@ function showNotification(type, message) {
                     </div>
 
                     {{-- Tab: Fotos --}}
-                  {{-- Tab: Fotos --}}
 <div id="tab-fotos" class="tab-content">
     <div class="section-header">
         <h2 class="section-title">Fotos de la Obra</h2>
@@ -1180,6 +1257,337 @@ function showNotification(type, message) {
     <img id="modalImage" style="margin: auto; display: block; max-width: 90%; max-height: 90%; object-fit: contain;">
     <div id="modalCaption" style="text-align: center; color: white; padding: 1rem; font-size: 16px;"></div>
 </div>
+<div id="tab-directorio" class="tab-content">
+    <div class="section-header">
+        <h2 class="section-title">Directorio de la Obra</h2>
+        <button class="btn btn-primary" onclick="toggleForm('add-persona-form')">
+            ➕ Agregar Persona
+        </button>
+    </div>
+
+    {{-- Formulario agregar persona --}}
+    <div id="add-persona-form" style="display: none; margin-bottom: 2rem;">
+        <form id="form-persona" data-obra-id="{{ $obra->id }}">
+            @csrf
+            <div class="info-card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" name="nombre_completo" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rol en la empresa</label>
+                        <input type="text" name="rol_empresa" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Celular</label>
+                        <input type="text" name="celular" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha de asignación</label>
+                        <input type="date" name="fecha_asignacion" class="form-input"
+                               value="{{ date('Y-m-d') }}">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Guardar</span>
+                        <span class="btn-spinner" style="display: none;">⏳ Guardando...</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleForm('add-persona-form')">Cancelar</button>
+                    <span id="persona-form-msg" style="color: #6b7280; font-size: 14px;"></span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- Tabla listado de personas --}}
+    <table class="table" id="tabla-personas">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Celular</th>
+                <th>Email</th>
+                <th>Fecha asignación</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($obra->personas as $persona)
+                <tr data-id="{{ $persona->id }}" class="text-dark">
+                    <td>{{ $persona->nombre_completo }}</td>
+                    <td>{{ $persona->rol_empresa }}</td>
+                    <td>{{ $persona->celular }}</td>
+                    <td>{{ $persona->email }}</td>
+                    <td>{{ optional($persona->fecha_asignacion)->format('Y-m-d') }}</td>
+                    <td>
+                        
+                        <button
+                            class="btn btn-outline-secondary btn-sm btn-edit-persona"
+                            data-id="{{ $persona->id }}"
+                            data-nombre="{{ $persona->nombre_completo }}"
+                            data-rol="{{ $persona->rol_empresa }}"
+                            data-celular="{{ $persona->celular }}"
+                            data-email="{{ $persona->email }}"
+                            data-fecha="{{ optional($persona->fecha_asignacion)->format('Y-m-d') }}"
+                            data-url="{{ route('obras.personas.update', [$obra, $persona]) }}"
+                        >
+                            ✏️
+                        </button>
+                        <button class="btn btn-danger btn-sm btn-delete-persona"
+                                data-url="{{ route('obras.personas.destroy', [$obra, $persona]) }}">
+                            🗑
+                        </button>
+                        
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+        
+    </table>
+    {{-- Panel para editar persona (oculto al inicio) --}}
+<div id="edit-persona-wrapper" style="display: none; margin-top: 1.5rem;">
+    <div class="info-card">
+        <h5 style="margin-bottom: 1rem;">Editar persona</h5>
+
+        <form id="form-editar-persona">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="edit-url">
+
+            <div class="edit-grid">
+                <div class="form-group">
+                    <label class="form-label">Nombre completo</label>
+                    <input type="text" name="nombre_completo" id="edit-nombre" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rol en la empresa</label>
+                    <input type="text" name="rol_empresa" id="edit-rol" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Celular</label>
+                    <input type="text" name="celular" id="edit-celular" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" id="edit-email" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fecha de asignación</label>
+                    <input type="date" name="fecha_asignacion" id="edit-fecha" class="form-input">
+                </div>
+                
+            </div>
+
+            <div style="margin-top: 1rem; display:flex; gap:0.75rem;">
+                <button type="button" class="btn btn-danger" id="btn-cancelar-edicion">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-cambios">
+                    Guardar cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    
+</div>
+
+<script>
+    
+//editar una persona
+$(document).ready(function () {
+    // ... (tu código de crear y eliminar personas sigue igual)
+
+    // CLICK EN BOTÓN EDITAR → abre panel y carga datos
+    $('#tabla-personas').on('click', '.btn-edit-persona', function () {
+        const $btn = $(this);
+
+        // Llenar los campos con los data-*
+        $('#edit-nombre').val($btn.data('nombre'));
+        $('#edit-rol').val($btn.data('rol'));
+        $('#edit-celular').val($btn.data('celular'));
+        $('#edit-email').val($btn.data('email'));
+        $('#edit-fecha').val($btn.data('fecha') || '');
+
+        // Guardar URL y ID de la persona en el form
+        $('#edit-url').val($btn.data('url'));
+        $('#form-editar-persona').data('persona-id', $btn.data('id'));
+
+        // Mostrar el panel de edición
+        $('#edit-persona-wrapper').slideDown();
+
+        // Hacer scroll suave hacia el editor
+        $('html, body').animate({
+            scrollTop: $('#edit-persona-wrapper').offset().top - 100
+        }, 300);
+    });
+
+    // CLICK EN "Cancelar" → ocultar panel
+    $('#btn-cancelar-edicion').on('click', function () {
+        $('#edit-persona-wrapper').slideUp();
+    });
+
+    // CLICK EN "Guardar cambios" → Ajax PUT
+    $('#btn-guardar-cambios').on('click', function () {
+        const $form = $('#form-editar-persona');
+        const url = $('#edit-url').val();
+        const personaId = $form.data('persona-id');
+
+        $.ajax({
+            url: url,
+            method: 'POST', // usamos POST + _method=PUT
+            data: $form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    const p = response.persona;
+
+                    // Actualizar la fila en la tabla
+                    const $row = $('#tabla-personas tbody tr[data-id="' + personaId + '"]');
+                    $row.find('td').eq(0).text(p.nombre_completo ?? '');
+                    $row.find('td').eq(1).text(p.rol_empresa ?? '');
+                    $row.find('td').eq(2).text(p.celular ?? '');
+                    $row.find('td').eq(3).text(p.email ?? '');
+                    $row.find('td').eq(4).text(p.fecha_asignacion ?? '');
+
+                    // Ocultar panel de edición
+                    $('#edit-persona-wrapper').slideUp();
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    alert('Hay errores de validación, revisa los datos.');
+                } else {
+                    alert('Ocurrió un error al actualizar.');
+                }
+            }
+        });
+    });
+});
+
+    //AJAX para Directorio de Personas
+$(document).ready(function () {
+    // Envío del formulario por Ajax
+    $('#form-persona').on('submit', function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const obraId = $form.data('obra-id');
+        const url = "{{ route('obras.personas.store', ['obra' => 'OBRA_ID_PLACEHOLDER']) }}"
+            .replace('OBRA_ID_PLACEHOLDER', obraId);
+
+        const $btnText = $form.find('.btn-text');
+        const $btnSpinner = $form.find('.btn-spinner');
+        const $msg = $('#persona-form-msg');
+        const fecha = p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : '';
+        $row.find('td').eq(4).text(fecha);
+
+
+        $btnText.hide();
+        $btnSpinner.show();
+        $msg.text('');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: $form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    const p = response.persona;
+
+                    // Agregar la nueva fila a la tabla
+                    const rowHtml = `
+                        <tr data-id="${p.id}" class="text-dark text-center">
+                            <td>${p.nombre_completo ?? ''}</td>
+                            <td>${p.rol_empresa ?? ''}</td>
+                            <td>${p.celular ?? ''}</td>
+                            <td>${p.email ?? ''}</td>
+                            <td>${p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : ''}</td>
+
+                            <td>
+                                <button class="btn btn-danger btn-sm btn-delete-persona"
+                                        data-url="/obras/${obraId}/personas/${p.id}">
+                                    🗑
+                                </button>
+                                <button class="btn btn-danger btn-sm btn-delete-persona"
+                                        data-url="/obras/${obraId}/personas/${p.id}">
+                                    🗑 
+                                    </button>
+                                
+                            </td>
+                            
+                        </tr>
+                    `;
+
+
+                    $('#tabla-personas tbody').append(rowHtml);
+                    $form[0].reset();
+                    $msg.text(response.message).css('color', 'green');
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    // errores de validación
+                    const errors = xhr.responseJSON.errors;
+                    let text = 'Errores: ';
+                    for (const field in errors) {
+                        text += errors[field].join(', ') + ' ';
+                    }
+                    $msg.text(text).css('color', 'red');
+                } else {
+                    $msg.text('Ocurrió un error al guardar.').css('color', 'red');
+                }
+            },
+            complete: function () {
+                $btnText.show();
+                $btnSpinner.hide();
+            }
+        });
+    });
+
+    // Eliminar persona por Ajax (delegado para filas nuevas)
+    $('#tabla-personas').on('click', '.btn-delete-persona', function () {
+        if (!confirm('¿Eliminar esta persona del directorio?')) return;
+
+        const $btn = $(this);
+        const url = $btn.data('url');
+        const $row = $btn.closest('tr');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                _method: 'DELETE',
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (response) {
+                if (response.success) {
+                    $row.remove();
+                }
+            },
+            error: function () {
+                alert('No se pudo eliminar la persona.');
+            }
+        });
+    });
+});
+</script>
+
 
 <script>
 // AJAX para Fotos
@@ -1387,4 +1795,7 @@ $(document).on('mouseenter', '.foto-card', function() {
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
     </script>
+    
+   
+
 </x-app-layout>

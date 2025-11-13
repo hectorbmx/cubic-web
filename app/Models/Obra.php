@@ -266,4 +266,8 @@ class Obra extends Model
     {
         return $this->usuarios()->where('user_id', $userId)->exists();
     }
+    public function personas()
+    {
+        return $this->hasMany(ObraPersona::class);
+    }
 }

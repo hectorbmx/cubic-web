@@ -46,7 +46,7 @@ class User extends Authenticatable
     // Relación con empresas (clientes) - muchos a muchos
     public function clientes()
     {
-        return $this->belongsToMany(Cliente::class, 'cliente_user')
+        return $this->belongsToMany(Cliente::class, 'cliente_user','user_id','cliente_id')
                     ->withPivot('role', 'status', 'invited_at', 'accepted_at', 'invited_by_user_id')
                     ->withTimestamps();
     }
@@ -125,19 +125,31 @@ class User extends Authenticatable
     }
 
     // Verificar si es admin de una empresa
-    public function isCompanyAdmin($clienteId)
-    {
-        return $this->getRoleInCliente($clienteId) === 'company_admin';
-    }
+    // public function isCompanyAdmin($clienteId)
+    // {
+    //     return $this->getRoleInCliente($clienteId) === 'company_admin';
+    // }
+    public function isCompanyAdmin(int $clienteId): bool
+{
+    return \DB::table('cliente_user')
+        ->where('user_id', $this->id)
+        ->where('cliente_id', $clienteId)
+        ->where('role', 'company_admin')
+        ->exists();
+}
 
     // Verificar si es SuperAdmin
-public function isSuperAdmin()
+    public function isSuperAdmin(): bool
     {
-        // Opción con Spatie
-        return $this->hasRole('superadmin');
-        
-        // O mantener el email como fallback
-        // return $this->hasRole('superadmin') || $this->email === 'hectorhaw@gmail.com';
+        return method_exists($this, 'hasRole')
+            ? $this->hasRole('superadmin')
+            : ($this->role ?? null) === 'superadmin';
+    }
+    public function isProfileComplete(): boolval{
+
+        return !empty($this->name) &&
+               !empty($this->phone) &&
+               !empty($this->position);
     }
 
 }

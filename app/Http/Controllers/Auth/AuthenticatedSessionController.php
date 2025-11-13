@@ -45,4 +45,11 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
+    protected function authenticated($request, $user)
+    {
+        if (!$user->isProfileComplete()) {
+            return redirect('/profile');
+        }
+        // return redirect()->intended('/dashboard');  // tu destino normal
+    }
 }
