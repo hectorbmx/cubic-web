@@ -29,6 +29,7 @@ class ObraFoto extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    protected $appends = ['url', 'thumbnail'];
 
     public function obra()
     {
@@ -40,18 +41,18 @@ class ObraFoto extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    // public function getUrlAttribute()
-    // {
-    //     return Storage::url($this->ruta_archivo);
-    // }
     public function getUrlAttribute()
-{
-    // Obtener solo el path relativo
-    $path = str_replace('/storage', '', Storage::url($this->ruta_archivo));
-    
-    // Construir URL completa con APP_URL
-    return config('app.url') . '/storage' . $path;
-}
+    {
+        // Devuelve solo la ruta relativa
+        // El frontend la resolverá con su baseURL configurada
+        return '/storage/' . $this->ruta_archivo;
+    }
+       public function getThumbnailAttribute()
+    {
+        // Por ahora, devuelve la misma imagen
+        // Puedes implementar thumbnails reales más adelante
+        return '/storage/' . $this->ruta_archivo;
+    }
 
     public function deleteFile()
     {
@@ -60,5 +61,4 @@ class ObraFoto extends Model
         }
         return false;
     }
-    
 }
