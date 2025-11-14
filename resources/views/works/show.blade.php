@@ -1412,30 +1412,127 @@ function showNotification(type, message) {
     
 //editar una persona
 $(document).ready(function () {
-    // ... (tu código de crear y eliminar personas sigue igual)
-
-    // CLICK EN BOTÓN EDITAR → abre panel y carga datos
-    $('#tabla-personas').on('click', '.btn-edit-persona', function () {
+    console.log('✅ Script de directorio cargado');
+    
+    // Prevenir submit del formulario por si acaso
+    $('#form-persona').on('submit', function (e) {
+        e.preventDefault();
+        console.log('🛑 Submit del form interceptado y bloqueado');
+        return false;
+    });
+    
+    // Capturar click del botón Guardar usando su ID específico
+    $(document).on('click', '#btn-guardar-persona', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('📤 Click en botón Guardar Persona');
+        
         const $btn = $(this);
+        const $form = $('#form-persona');
+        const obraId = $form.data('obra-id');
+        
+        console.log('🔍 Obra ID:', obraId);
+        
+        if (!obraId) {
+            alert('Error: No se encontró el ID de la obra');
+            return false;
+        }
+        
+        const url = "{{ route('obras.personas.store', ['obra' => 'OBRA_ID_PLACEHOLDER']) }}"
+            .replace('OBRA_ID_PLACEHOLDER', obraId);
 
-        // Llenar los campos con los data-*
-        $('#edit-nombre').val($btn.data('nombre'));
-        $('#edit-rol').val($btn.data('rol'));
-        $('#edit-celular').val($btn.data('celular'));
-        $('#edit-email').val($btn.data('email'));
-        $('#edit-fecha').val($btn.data('fecha') || '');
+        const $btnText = $btn.find('.btn-text');
+        const $btnSpinner = $btn.find('.btn-spinner');
+        const $msg = $('#persona-form-msg');
+        
+        console.log('📋 Datos del formulario:', $form.serializeArray());
+        console.log('🎯 URL de envío:', url);
 
-        // Guardar URL y ID de la persona en el form
-        $('#edit-url').val($btn.data('url'));
-        $('#form-editar-persona').data('persona-id', $btn.data('id'));
+        $btn.prop('disabled', true);
+        $btnText.hide();
+        $btnSpinner.show();
+        $msg.text('');
 
-        // Mostrar el panel de edición
-        $('#edit-persona-wrapper').slideDown();
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: $form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                console.log('✅ Respuesta exitosa:', response);
+                
+                if (response.success) {
+                    const p = response.persona;
+                    
+                    // Formatear fecha correctamente
+                    const fecha = p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : '';
 
-        // Hacer scroll suave hacia el editor
-        $('html, body').animate({
-            scrollTop: $('#edit-persona-wrapper').offset().top - 100
-        }, 300);
+                    // Agregar la nueva fila a la tabla
+                    const rowHtml = `
+                        <tr data-id="${p.id}" class="text-dark">
+                            <td>${p.nombre_completo ?? ''}</td>
+                            <td>${p.rol_empresa ?? ''}</td>
+                            <td>${p.celular ?? ''}</td>
+                            <td>${p.email ?? ''}</td>
+                            <td>${fecha}</td>
+                            <td>
+                                <button class="btn btn-outline-secondary btn-sm btn-edit-persona"
+                                    data-id="${p.id}"
+                                    data-nombre="${p.nombre_completo ?? ''}"
+                                    data-rol="${p.rol_empresa ?? ''}"
+                                    data-celular="${p.celular ?? ''}"
+                                    data-email="${p.email ?? ''}"
+                                    data-fecha="${fecha}"
+                                    data-url="/obras/${obraId}/personas/${p.id}">
+                                    ✏️
+                                </button>
+                                <button class="btn btn-danger btn-sm btn-delete-persona"
+                                        data-url="/obras/${obraId}/personas/${p.id}">
+                                    🗑️
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+
+                    $('#tabla-personas tbody').append(rowHtml);
+                    $form[0].reset();
+                    $msg.text(response.message).css('color', 'green');
+                    
+                    // Cerrar formulario después de 2 segundos
+                    setTimeout(function() {
+                        toggleForm('add-persona-form');
+                        $msg.text('');
+                    }, 2000);
+                }
+            },
+            error: function (xhr) {
+                console.error('❌ Error completo:', xhr);
+                console.error('❌ Status:', xhr.status);
+                console.error('❌ Response:', xhr.responseJSON);
+                
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    let text = 'Errores de validación: ';
+                    for (const field in errors) {
+                        text += errors[field].join(', ') + ' ';
+                    }
+                    $msg.text(text).css('color', 'red');
+                } else if (xhr.status === 404) {
+                    $msg.text('Error 404: Ruta no encontrada').css('color', 'red');
+                } else {
+                    $msg.text('Error al guardar: ' + (xhr.responseJSON?.message || 'Error desconocido')).css('color', 'red');
+                }
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.show();
+                $btnSpinner.hide();
+            }
+        });
+        
+        return false;
     });
 
     // CLICK EN "Cancelar" → ocultar panel
@@ -1481,23 +1578,47 @@ $(document).ready(function () {
 });
 
     //AJAX para Directorio de Personas
+//AJAX para Directorio de Personas
 $(document).ready(function () {
-    // Envío del formulario por Ajax
+    console.log('✅ Script de directorio cargado');
+    
+    // Prevenir submit normal del formulario
     $('#form-persona').on('submit', function (e) {
         e.preventDefault();
-
-        const $form = $(this);
+        console.log('🛑 Submit interceptado');
+        return false;
+    });
+    
+    // Capturar click del botón Guardar directamente
+    $(document).on('click', '#form-persona .btn-primary', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('📤 Click en botón Guardar');
+        
+        const $btn = $(this);
+        const $form = $('#form-persona');
         const obraId = $form.data('obra-id');
+        
+        console.log('🔍 Obra ID:', obraId);
+        
+        if (!obraId) {
+            alert('Error: No se encontró el ID de la obra');
+            return false;
+        }
+        
         const url = "{{ route('obras.personas.store', ['obra' => 'OBRA_ID_PLACEHOLDER']) }}"
             .replace('OBRA_ID_PLACEHOLDER', obraId);
 
-        const $btnText = $form.find('.btn-text');
-        const $btnSpinner = $form.find('.btn-spinner');
+        const $btnText = $btn.find('.btn-text');
+        const $btnSpinner = $btn.find('.btn-spinner');
         const $msg = $('#persona-form-msg');
-        const fecha = p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : '';
-        $row.find('td').eq(4).text(fecha);
+        
+        const formData = $form.serializeArray();
+        console.log('📋 Datos del formulario:', formData);
 
+        console.log('🎯 URL de envío:', url);
 
+        $btn.prop('disabled', true);
         $btnText.hide();
         $btnSpinner.show();
         $msg.text('');
@@ -1506,67 +1627,96 @@ $(document).ready(function () {
             url: url,
             method: 'POST',
             data: $form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function (response) {
+                console.log('✅ Respuesta exitosa:', response);
+                
                 if (response.success) {
                     const p = response.persona;
+                    
+                    // Formatear fecha correctamente
+                    const fecha = p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : '';
 
                     // Agregar la nueva fila a la tabla
                     const rowHtml = `
-                        <tr data-id="${p.id}" class="text-dark text-center">
+                        <tr data-id="${p.id}" class="text-dark">
                             <td>${p.nombre_completo ?? ''}</td>
                             <td>${p.rol_empresa ?? ''}</td>
                             <td>${p.celular ?? ''}</td>
                             <td>${p.email ?? ''}</td>
-                            <td>${p.fecha_asignacion ? p.fecha_asignacion.split('T')[0] : ''}</td>
-
+                            <td>${fecha}</td>
                             <td>
-                                <button class="btn btn-danger btn-sm btn-delete-persona"
-                                        data-url="/obras/${obraId}/personas/${p.id}">
-                                    🗑
+                                <button class="btn btn-outline-secondary btn-sm btn-edit-persona"
+                                    data-id="${p.id}"
+                                    data-nombre="${p.nombre_completo ?? ''}"
+                                    data-rol="${p.rol_empresa ?? ''}"
+                                    data-celular="${p.celular ?? ''}"
+                                    data-email="${p.email ?? ''}"
+                                    data-fecha="${fecha}"
+                                    data-url="/obras/${obraId}/personas/${p.id}">
+                                    ✏️
                                 </button>
                                 <button class="btn btn-danger btn-sm btn-delete-persona"
                                         data-url="/obras/${obraId}/personas/${p.id}">
-                                    🗑 
-                                    </button>
-                                
+                                    🗑️
+                                </button>
                             </td>
-                            
                         </tr>
                     `;
-
 
                     $('#tabla-personas tbody').append(rowHtml);
                     $form[0].reset();
                     $msg.text(response.message).css('color', 'green');
+                    
+                    // Cerrar formulario después de 2 segundos
+                    setTimeout(function() {
+                        toggleForm('add-persona-form');
+                        $msg.text('');
+                    }, 2000);
                 }
             },
             error: function (xhr) {
+                console.error('❌ Error completo:', xhr);
+                console.error('❌ Status:', xhr.status);
+                console.error('❌ Response:', xhr.responseJSON);
+                
                 if (xhr.status === 422) {
-                    // errores de validación
                     const errors = xhr.responseJSON.errors;
-                    let text = 'Errores: ';
+                    let text = 'Errores de validación: ';
                     for (const field in errors) {
                         text += errors[field].join(', ') + ' ';
                     }
                     $msg.text(text).css('color', 'red');
+                } else if (xhr.status === 404) {
+                    $msg.text('Error 404: Ruta no encontrada. Verifica las rutas.').css('color', 'red');
                 } else {
-                    $msg.text('Ocurrió un error al guardar.').css('color', 'red');
+                    $msg.text('Ocurrió un error al guardar: ' + (xhr.responseJSON?.message || 'Error desconocido')).css('color', 'red');
                 }
             },
             complete: function () {
+                $btn.prop('disabled', false);
                 $btnText.show();
                 $btnSpinner.hide();
             }
         });
+        
+        return false;
     });
 
-    // Eliminar persona por Ajax (delegado para filas nuevas)
-    $('#tabla-personas').on('click', '.btn-delete-persona', function () {
+    // Eliminar persona por Ajax
+    $('#tabla-personas').on('click', '.btn-delete-persona', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         if (!confirm('¿Eliminar esta persona del directorio?')) return;
 
         const $btn = $(this);
         const url = $btn.data('url');
         const $row = $btn.closest('tr');
+
+        console.log('🗑️ Eliminando persona:', url);
 
         $.ajax({
             url: url,
@@ -1576,20 +1726,24 @@ $(document).ready(function () {
                 _token: '{{ csrf_token() }}'
             },
             success: function (response) {
+                console.log('✅ Persona eliminada:', response);
                 if (response.success) {
-                    $row.remove();
+                    $row.fadeOut(300, function() {
+                        $(this).remove();
+                    });
                 }
             },
-            error: function () {
+            error: function (xhr) {
+                console.error('❌ Error al eliminar:', xhr);
                 alert('No se pudo eliminar la persona.');
             }
         });
     });
+    
+    console.log('✅ Event listeners registrados');
 });
-</script>
-
-
-<script>
+    // Eliminar persona por Ajax (delegado para filas nuevas)
+   
 // AJAX para Fotos
 $(document).ready(function() {
     // Preview de fotos seleccionadas

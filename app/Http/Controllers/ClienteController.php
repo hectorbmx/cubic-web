@@ -130,11 +130,11 @@ class ClienteController extends Controller
 
                     // Enviar email de invitación
                     // Mail::to($user->email)->send(new UserInvitation($user, $cliente, $token));
-                    \Log::info('Invitación generada', [
-    'user' => $user->email,
-    'token' => $token,
-    'url' => route('invitation.show', ['token' => $token])
-]);
+                                \Log::info('Invitación generada', [
+                'user' => $user->email,
+                'token' => $token,
+                'url' => route('invitation.show', ['token' => $token])
+                ]);
                 } else {
                     // Si ya existe, solo actualizar el estado si es necesario
                     $membership = $cliente->usuarios()->where('user_id', $user->id)->first();
