@@ -12,6 +12,7 @@ use App\Http\Controllers\ObraFotoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\NewRegisterController;
 use App\Http\Controllers\ObraPersonaController;
+use App\Http\Controllers\UserManagementController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -150,6 +151,10 @@ require __DIR__.'/auth.php';
 
 
 Route::middleware('auth')->group(function () {
+
+    // Rutas de gestión de usuarios
+    Route::resource('users', UserManagementController::class);
+
     Route::get('/usuarios/{user}/obras', [App\Http\Controllers\UserController::class, 'obras'])
         ->name('usuarios.obras');
     
