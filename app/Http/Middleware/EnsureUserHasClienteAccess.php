@@ -15,50 +15,30 @@ class EnsureUserHasClienteAccess
 {
     $user = auth()->user();
     
-    // DEBUG
-    \Log::info('🔒 Middleware ClienteAccess', [
-        'user_id' => $user->id,
-        'is_superadmin' => $user->isSuperAdmin(),
-        'route' => $request->route()->getName(),
-    ]);
-    
     // SuperAdmin tiene acceso a todo
     if ($user && $user->isSuperAdmin()) {
-        \Log::info('✅ SuperAdmin - acceso permitido');
         return $next($request);
     }
     
-    // Obtener cliente_id del request
     $clienteId = $this->getClienteIdFromRequest($request);
     
-    \Log::info('🔍 Cliente ID detectado', [
-        'cliente_id' => $clienteId,
-    ]);
-    
-    // Si no hay cliente_id en la request, permitir
+    // Si no hay cliente_id, permitir
     if (!$clienteId) {
-        \Log::info('⚠️ No hay cliente_id - permitiendo acceso');
         return $next($request);
     }
     
     // Verificar acceso
-    $tieneAcceso = $user->esClienteDeUsuario($clienteId);
-    
-    \Log::info('🔐 Verificación de acceso', [
-        'cliente_id' => $clienteId,
-        'tiene_acceso' => $tieneAcceso,
-        'clientes_usuario' => $user->clientes->pluck('id')->toArray(),
-    ]);
-    
-    if ($user && $tieneAcceso) {
-        \Log::info('✅ Acceso permitido');
+    if ($user && $user->esClienteDeUsuario($clienteId)) {
         return $next($request);
     }
     
-    \Log::error('❌ Acceso DENEGADO', [
-        'cliente_id' => $clienteId,
-        'clientes_usuario' => $user->clientes->pluck('id')->toArray(),
-    ]);
+    // DENEGADO - Responder según tipo de request
+    if ($request->expectsJson() || $request->is('api/*')) {
+        return response()->json([
+            'message' => 'No tienes acceso a este cliente.',
+            'error' => 'forbidden'
+        ], 403);
+    }
     
     abort(403, 'No tienes acceso a este cliente.');
 }

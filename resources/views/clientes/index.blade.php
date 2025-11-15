@@ -412,7 +412,7 @@
                                                 </a>
                                                 @endif
                                                 @if(auth()->user()->roles->count() > 0 && auth()->user()->hasAnyRole(['admin', 'superadmin']))
-                                                 <a href="{{ route('clientes.show', $cliente) }}" class="btn-icon btn-ver" title="Ver detalles">
+                                                 <a href="{{ route('clientes.show', $cliente) }}" class="btn-icon btn-primary" title="Ver detalles">
                                                     👁️ Ver Cliente
                                                 </a>
                                                 @endif

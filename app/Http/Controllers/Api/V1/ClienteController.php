@@ -8,49 +8,6 @@ use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
-    // public function index()
-    // {
-    //     $clientes = Cliente::withCount('obras')
-    //         ->orderBy('name')
-    //         ->get();
-
-    //     return response()->json([
-    //         'clientes' => $clientes->map(function ($cliente) {
-    //             return [
-    //                 'id' => $cliente->id,
-    //                 'nombre' => $cliente->name,
-    //                 'email' => $cliente->email,
-    //                 'telefono' => $cliente->phone ?? null,
-    //                 'direccion' => $cliente->address ?? null,
-    //                 'obrasActivas' => $cliente->obras_count,
-    //             ];
-    //         })
-    //     ]);
-    // }
-
-    // public function show(Cliente $cliente)
-    // {
-    //     $cliente->load('obras');
-
-    //     return response()->json([
-    //         'cliente' => [
-    //             'id' => $cliente->id,
-    //             'nombre' => $cliente->name,
-    //             'email' => $cliente->email,
-    //             'telefono' => $cliente->phone ?? null,
-    //             'direccion' => $cliente->address ?? null,
-    //             'obrasActivas' => $cliente->obras->count(),
-    //             'obras' => $cliente->obras->map(function ($obra) {
-    //                 return [
-    //                     'id' => $obra->id,
-    //                     'nombre' => $obra->name,
-    //                     'estado' => $obra->status,
-    //                     'progreso' => $obra->progress_pct ?? 0,
-    //                 ];
-    //             })
-    //         ]
-    //     ]);
-    // }
     //estos funcionan antes de configurar los roles
      public function index(Request $request)
     {
