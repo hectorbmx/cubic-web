@@ -8,7 +8,7 @@
 
         .page-hero {
             background: linear-gradient(135deg, #2c4a6b 0%, #1e3449 100%);
-            padding: 2rem;
+            padding: 1.25rem 1.75rem; /* ← Aún más reducido */
             border-radius: 16px;
             color: white;
             margin-bottom: 2rem;
@@ -18,60 +18,76 @@
         .hero-content {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            align-items: flex-start; /* ← Cambiado de center */
+            gap: 2rem;
         }
 
-        .hero-title h1 {
-            font-size: 32px;
+        .hero-left {
+            flex: 1;
+        }
+
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hero-title {
+            font-size: 24px;
             font-weight: 700;
             margin: 0;
         }
 
-        .hero-subtitle {
-            font-size: 16px;
+        .hero-title h1 {
+            font-size: 24px; /* ← Reducido de 32px */
+            font-weight: 700;
+            margin: 0;
+        }
+
+       .hero-subtitle {
+            font-size: 14px;
             opacity: 0.9;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
 
         .client-meta {
             display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
+            gap: 1.5rem;
+            margin-top: 0.75rem;
             flex-wrap: wrap;
         }
 
         .client-meta-item {
-            display: flex;
+           display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 14px;
+            gap: 0.35rem; /* ← Reducido de 0.5rem */
+            font-size: 13px; /* ← Reducido de 14px */
         }
+
 
         .obras-badge {
-            background: #FCC200;
+           background: #FCC200;
             color: #2c4a6b;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
+            padding: 0.35rem 0.85rem; /* ← Reducido de 0.5rem 1rem */
+            border-radius: 8px; /* ← Reducido de 10px */
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px; /* ← Reducido de 14px */
             display: inline-block;
-            margin-top: 1rem;
+            margin-top: 0.75rem; /* ← Reducido de 1rem */
         }
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+       .btn {
+            padding: 0.6rem 1.25rem; /* ← Reducido de 0.75rem 1.5rem */
+            border-radius: 8px; /* ← Reducido de 10px */
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px; /* ← Reducido de 14px */
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem; /* ← Reducido de 0.5rem */
         }
 
         .btn-primary {
@@ -282,38 +298,45 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 
+                
                 {{-- Hero Header --}}
-                <div class="page-hero">
-                    <div class="hero-content">
-                        <div>
-                            <h1 class="hero-title">🏢 {{ $cliente->name }}</h1>
-                            <p class="hero-subtitle">Todas las obras asignadas a este cliente</p>
-                            <div class="client-meta">
-                                @if($cliente->email)
-                                    <div class="client-meta-item">
-                                        <span>📧</span>
-                                        <span>{{ $cliente->email }}</span>
-                                    </div>
-                                @endif
-                                @if($cliente->phone)
-                                    <div class="client-meta-item">
-                                        <span>📞</span>
-                                        <span>{{ $cliente->phone }}</span>
-                                    </div>
-                                @endif
-                            </div>
-                            <span class="obras-badge">📊 {{ $obras->count() }} obra(s) registrada(s)</span>
-                        </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <a href="{{ route('clientes.index') }}" class="btn btn-secondary">
-                                ← Volver a Clientes
-                            </a>
-                            <a href="{{ route('works.create', ['client_id' => $cliente->id]) }}" class="btn btn-primary">
-                                ➕ Nueva Obra
-                            </a>
-                        </div>
+            {{-- Hero Header --}}
+<div class="page-hero">
+    <div class="hero-content">
+        <div class="hero-left">
+            <h1 class="hero-title">🏢 {{ $cliente->name }}</h1>
+            <p class="hero-subtitle">Todas las obras asignadas a este cliente</p>
+            <div class="client-meta">
+                @if($cliente->email)
+                    <div class="client-meta-item">
+                        <span>📧</span>
+                        <span>{{ $cliente->email }}</span>
                     </div>
-                </div>
+                @endif
+                @if($cliente->phone)
+                    <div class="client-meta-item">
+                        <span>📞</span>
+                        <span>{{ $cliente->phone }}</span>
+                    </div>
+                @endif
+            </div>
+        </div>
+        
+        <div class="hero-right">
+            <span class="obras-badge">📊 {{ $obras->count() }} obra(s) registrada(s)</span>
+            <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem;">
+                <a href="{{ route('clientes.index') }}" class="btn btn-secondary">
+                    ← Volver a Clientes
+                </a>
+                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('superadmin'))
+                <a href="{{ route('works.create', ['client_id' => $cliente->id]) }}" class="btn btn-primary">
+                    ➕ Nueva Obra
+                </a>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 
                 {{-- Obras Table --}}
                 @if($obras->count() > 0)
@@ -400,9 +423,11 @@
                             <div class="empty-state-icon">🏗️</div>
                             <h3>No hay obras registradas</h3>
                             <p>Este cliente aún no tiene obras asignadas</p>
-                            <a href="{{ route('works.create', ['client_id' => $cliente->id]) }}" class="btn btn-primary">
-                                ➕ Crear Primera Obra
-                            </a>
+                          @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('superadmin'))
+                                <a href="{{ route('works.create') }}?client_id={{ $cliente->id }}" class="btn btn-primary" style="margin-top: 1rem;">
+                                    Crear Primera Obra
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endif

@@ -18,20 +18,17 @@ class ClienteController extends Controller
     /**
      * Muestra la lista de clientes según el rol del usuario
      */
-   public function index(Request $request)
+  public function index(Request $request)
 {
     $user = Auth::user();
-    // Query base con conteo de obras
-    $clientes = \App\Models\Cliente::visibleFor(auth()->user())
-    ->withCount('obras')
-    ->latest()
-    ->get();
-
-    $query = Cliente::withCount([
-        'obras as obras_activas_count' => function($query) {
-            $query->whereIn('status', ['planning', 'in_progress']);
-        }
-    ]);
+    
+    // Query base con scope visibleFor (filtra por clientes del usuario)
+    $query = Cliente::visibleFor($user)
+        ->withCount([
+            'obras as obras_activas_count' => function($query) {
+                $query->whereIn('status', ['planning', 'in_progress']);
+            }
+        ]);
 
     // Búsqueda
     if ($request->has('search') && $request->search) {
@@ -53,6 +50,9 @@ class ClienteController extends Controller
      */
     public function create()
 {
+     if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+        abort(403, 'No tienes permisos para crear clientes.');
+    }
     // Solo superadmin puede crear clientes
     $this->authorize('create', Cliente::class);
 
@@ -64,6 +64,9 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+         abort(403, 'No tienes permisos para crear clientes.');
+    }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
@@ -193,6 +196,9 @@ class ClienteController extends Controller
      */
 public function edit(Cliente $cliente)
 {
+     if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+        abort(403, 'No tienes permisos para crear clientes.');
+    }
     $this->authorize('update', $cliente);
 
     // Lista de todos los usuarios
@@ -208,6 +214,9 @@ public function edit(Cliente $cliente)
      */
     public function update(Request $request, Cliente $cliente)
     {
+         if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+           abort(403, 'No tienes permisos para crear clientes.');
+        }
         $this->authorize('update', $cliente);
 
         $validated = $request->validate([

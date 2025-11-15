@@ -16,14 +16,32 @@ class ObraController extends Controller
      * Muestra la lista de todas las obras
      * Vista: resources/views/works/index.blade.php
      */
-    public function index()
-    {
-        $obras = Obra::with(['cliente', 'manager'])
-            ->latest()
-            ->paginate(15);
-        
-        return view('works.index', compact('obras'));
+public function index()
+{
+    $user = auth()->user();
+    
+    // Query base filtrado por cliente
+    $query = Obra::query();
+    
+    if (!$user->isSuperAdmin()) {
+        $clientesIds = $user->getClientesIds();
+        $query->whereIn('client_id', $clientesIds);
     }
+    
+    // Estadísticas para las tarjetas
+    $stats = [
+        'total' => (clone $query)->count(),
+        'planning' => (clone $query)->where('status', 'planning')->count(),
+        'in_progress' => (clone $query)->where('status', 'in_progress')->count(),
+        'paused' => (clone $query)->where('status', 'paused')->count(),
+        'completed' => (clone $query)->where('status', 'completed')->count(),
+    ];
+    
+    // Listado de obras con paginación
+    $obras = (clone $query)->with('cliente')->latest()->paginate(15);
+    
+    return view('works.index', compact('obras', 'stats'));
+}
 
     /**
      * Muestra el formulario para crear una nueva obra
@@ -383,16 +401,27 @@ if ($request->filled('client_id')) {
      */
     public function dashboard()
     {
-        $stats = [
-            'total' => Obra::count(),
-            'planning' => Obra::planning()->count(),
-            'in_progress' => Obra::inProgress()->count(),
-            'paused' => Obra::paused()->count(),
-            'completed' => Obra::completed()->count(),
-            'cancelled' => Obra::cancelled()->count(),
-        ];
+        $user = auth()->user();
 
-        $recentObras = Obra::with(['cliente', 'manager'])
+        $query = Obra::query();
+
+        if (!$user->isSuperAdmin()) {
+        $clientesIds = $user->getClientesIds();
+        $query->whereIn('client_id', $clientesIds);
+    }
+
+        $stats = [
+        'total' => (clone $query)->count(),
+        'planning' => (clone $query)->planning()->count(),
+        'in_progress' => (clone $query)->inProgress()->count(),
+        'paused' => (clone $query)->paused()->count(),
+        'completed' => (clone $query)->completed()->count(),
+        'cancelled' => (clone $query)->cancelled()->count(),
+    ];
+
+       // Obras recientes filtradas
+         $recentObras = (clone $query)
+            ->with(['cliente', 'manager'])
             ->latest()
             ->take(10)
             ->get();

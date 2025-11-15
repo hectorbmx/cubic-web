@@ -535,9 +535,11 @@
 
                     {{-- Actions --}}
                     <div class="header-actions">
+                        @if(auth()->user()->roles->count() > 0 && auth()->user()->hasAnyRole(['admin', 'superadmin']))
                         <a href="{{ route('works.edit', $obra) }}" class="btn btn-primary">
                             ✏️ Editar Obra
                         </a>
+                        @endif
                         <a href="{{ route('clientes.show', $obra->cliente) }}" class="btn btn-secondary">
                             👁️ Ver Cliente
                         </a>

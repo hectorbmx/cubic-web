@@ -7,13 +7,36 @@
         }
 
         /* Header Principal */
-        .page-header {
+      .page-header {
             background: linear-gradient(135deg, #2c4a6b 0%, #1e3449 100%);
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
             color: white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .header-title-section h1 {
+            font-size: 28px; /* Reducido un poco */
+            font-weight: 700;
+            margin: 0 0 0.35rem 0;
+        }
+        .header-title-section .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-shrink: 0; /* Evita que se compriman */
         }
 
         .page-header h1 {
@@ -34,41 +57,46 @@
         }
 
         /* Estadísticas */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
+      /* Estadísticas */
+.stats-grid {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0rem;
+    flex-wrap: wrap;
+}
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+.stat-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem; /* ← Reducido de 1.5rem */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* ← Reducido de 1rem */
+    flex: 1;
+    min-width: 150px; /* ← Ancho mínimo más pequeño */
+}
 
-        .stat-icon {
-            font-size: 32px;
-        }
+.stat-icon {
+    font-size: 24px; /* ← Reducido de 32px */
+}
 
-        .stat-info {
-            flex: 1;
-        }
+.stat-info {
+    flex: 1;
+}
 
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 0.25rem;
-        }
+.stat-label {
+    font-size: 11px; /* ← Reducido de 12px */
+    opacity: 0.8;
+    margin-bottom: 0.15rem; /* ← Reducido de 0.25rem */
+    line-height: 1.2;
+}
 
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-        }
+.stat-value {
+    font-size: 22px; /* ← Reducido de 28px */
+    font-weight: 700;
+    line-height: 1;
+}
 
         /* Botones */
         .btn {
@@ -307,71 +335,76 @@
                 @endif
 
                 {{-- Header --}}
-                <div class="page-header">
-                    <h1>🏗️ Gestión de Obras</h1>
-                    <p class="subtitle">Administra y supervisa todas las obras del sistema</p>
+             {{-- Header --}}
+<div class="page-header">
+    <div class="header-top">
+        <div class="header-title-section">
+            <h1>🏗️ Gestión de Obras</h1>
+            <p class="subtitle">Administra y supervisa todas las obras del sistema</p>
+        </div>
+        <div class="header-actions">
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('superadmin'))
+            <a href="{{ route('works.create') }}" class="btn btn-primary">
+                ➕ Nueva Obra
+            </a>
+            @endif
+            <a href="{{ route('works.dashboard') }}" class="btn btn-secondary">
+                📊 Dashboard
+            </a>
+        </div>
+    </div>
+    
+    {{-- Estadísticas --}}
+    <div class="stats-grid">
+       @php
+            $totalObras = $stats['total'];
+            $enPlanificacion = $stats['planning'];
+            $enProgreso = $stats['in_progress'];
+            $pausadas = $stats['paused'];
+            $completadas = $stats['completed'];
+        @endphp
+        
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-info">
+                <div class="stat-label">Total Obras</div>
+                <div class="stat-value">{{ $totalObras }}</div>
+            </div>
+        </div>
 
-                    {{-- Estadísticas --}}
-                    <div class="stats-grid">
-                        @php
-                            $totalObras = App\Models\Obra::count();
-                            $enPlanificacion = App\Models\Obra::where('status', 'planning')->count();
-                            $enProgreso = App\Models\Obra::where('status', 'in_progress')->count();
-                            $pausadas = App\Models\Obra::where('status', 'paused')->count();
-                            $completadas = App\Models\Obra::where('status', 'completed')->count();
-                        @endphp
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">📊</div>
-                            <div class="stat-info">
-                                <div class="stat-label">Total Obras</div>
-                                <div class="stat-value">{{ $totalObras }}</div>
-                            </div>
-                        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+                <div class="stat-label">Planificación</div>
+                <div class="stat-value">{{ $enPlanificacion }}</div>
+            </div>
+        </div>
 
-                        <div class="stat-card">
-                            <div class="stat-icon">📋</div>
-                            <div class="stat-info">
-                                <div class="stat-label">Planificación</div>
-                                <div class="stat-value">{{ $enPlanificacion }}</div>
-                            </div>
-                        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🚧</div>
+            <div class="stat-info">
+                <div class="stat-label">En Progreso</div>
+                <div class="stat-value">{{ $enProgreso }}</div>
+            </div>
+        </div>
 
-                        <div class="stat-card">
-                            <div class="stat-icon">🚧</div>
-                            <div class="stat-info">
-                                <div class="stat-label">En Progreso</div>
-                                <div class="stat-value">{{ $enProgreso }}</div>
-                            </div>
-                        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⏸️</div>
+            <div class="stat-info">
+                <div class="stat-label">Pausadas</div>
+                <div class="stat-value">{{ $pausadas }}</div>
+            </div>
+        </div>
 
-                        <div class="stat-card">
-                            <div class="stat-icon">⏸️</div>
-                            <div class="stat-info">
-                                <div class="stat-label">Pausadas</div>
-                                <div class="stat-value">{{ $pausadas }}</div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon">✅</div>
-                            <div class="stat-info">
-                                <div class="stat-label">Completadas</div>
-                                <div class="stat-value">{{ $completadas }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Actions --}}
-                    <div class="header-actions">
-                        <a href="{{ route('works.create') }}" class="btn btn-primary">
-                            ➕ Nueva Obra
-                        </a>
-                        <a href="{{ route('works.dashboard') }}" class="btn btn-secondary">
-                            📊 Dashboard
-                        </a>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <div class="stat-label">Completadas</div>
+                <div class="stat-value">{{ $completadas }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 
                 {{-- Filtros --}}
                 <div class="filters-container">
@@ -514,6 +547,7 @@
                             {{ $obras->links() }}
                         </div>
                     @else
+                    @if(auth()->user()->hasRole(['admin', 'superadmin']))
                         <div class="empty-state">
                             <div class="empty-icon">🏗️</div>
                             <h3 style="font-size: 20px; color: #374151; margin-bottom: 0.5rem;">No hay obras registradas</h3>
@@ -522,6 +556,7 @@
                                 ➕ Crear Primera Obra
                             </a>
                         </div>
+                        @endif
                     @endif
                 </div>
             </div>

@@ -151,5 +151,34 @@ class User extends Authenticatable
                !empty($this->phone) &&
                !empty($this->position);
     }
+    // Verificar si es un cliente del usuario (para cualquier cliente asignado)
+    public function esClienteDeUsuario($clienteId)
+    {
+        // SuperAdmin tiene acceso a todos los clientes
+        if ($this->hasRole('superadmin')) {
+            return true;
+        }
+        
+        // Verificar si el cliente está asignado al usuario
+        return $this->clientes()->where('cliente_id', $clienteId)->exists();
+    }
+
+    // Obtener IDs de todos los clientes del usuario
+   // Obtener IDs de todos los clientes del usuario
+    public function getClientesIds()
+    {
+        // SuperAdmin tiene acceso a todos
+        if ($this->hasRole('superadmin')) {
+            return Cliente::pluck('id')->toArray();
+        }
+        
+        // Admin SIN clientes asignados tiene acceso a todos
+        if ($this->hasRole('admin') && $this->clientes()->count() === 0) {
+            return Cliente::pluck('id')->toArray();
+        }
+        
+        // Admin CON clientes asignados, o User → solo sus clientes
+        return $this->clientes()->pluck('cliente_id')->toArray();
+    }
 
 }

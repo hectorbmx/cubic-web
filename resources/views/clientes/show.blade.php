@@ -361,10 +361,13 @@
                                 <div class="empty-state">
                                     <div class="empty-icon">🏗️</div>
                                     <p>No hay obras registradas para este cliente</p>
-                                    <a href="{{ route('works.create') }}?client_id={{ $cliente->id }}" class="btn btn-primary" style="margin-top: 1rem;">
-                                        Crear Primera Obra
-                                    </a>
+                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('superadmin'))
+                                        <a href="{{ route('works.create') }}?client_id={{ $cliente->id }}" class="btn btn-primary" style="margin-top: 1rem;">
+                                            Crear Primera Obra
+                                        </a>
+                                    @endif
                                 </div>
+
                             @endif
                         </div>
                     </div>
