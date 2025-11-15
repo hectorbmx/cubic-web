@@ -46,30 +46,49 @@
             margin-top: 1.5rem;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1.25rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
 
-        .stat-icon {
-            font-size: 28px;
-            margin-bottom: 0.5rem;
-        }
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem; /* ← Más horizontal */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
 
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-        }
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
 
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-top: 0.25rem;
-        }
+.stat-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.stat-label {
+    font-size: 13px;
+    opacity: 0.9;
+    line-height: 1.3;
+    flex: 1; /* ← Toma el espacio restante */
+}
+
 
         .btn-primary {
             background: linear-gradient(135deg, #FCC200 0%, #f5b800 100%);
@@ -305,9 +324,11 @@
                         <div class="hero-title">
                             <h1>👥 Gestión de Clientes</h1>
                         </div>
+                        @if(auth()->user()->hasAnyRole(['admin', 'superadmin']))
                         <a href="{{ route('clientes.create') }}" class="btn-primary">
                             ➕ Nuevo Cliente
                         </a>
+                        @endif
                     </div>
                     <p class="hero-subtitle">Administra y supervisa todos los clientes del sistema</p>
 
@@ -380,16 +401,21 @@
                                                 <a href="{{ route('clientes.obras', $cliente) }}" class="btn-action btn-obras">
                                                     📋 Obras
                                                 </a>
+                                                @if(auth()->user()->hasAnyRole(['admin', 'superadmin']))
                                                 <a href="{{ route('clientes.edit', $cliente) }}" class="btn-action btn-edit">
                                                     ✏️ Editar
                                                 </a>
+                                                @endif
+                                                @if(auth()->user()->hasAnyRole(['admin', 'superadmin']))
                                                 <a href="{{ route('works.create') }}?client_id={{ $cliente->id }}" class="btn-action btn-add">
                                                     ➕ Agregar Obra
                                                 </a>
-                                         
+                                                @endif
+                                                @if(auth()->user()->roles->count() > 0 && auth()->user()->hasAnyRole(['admin', 'superadmin']))
                                                  <a href="{{ route('clientes.show', $cliente) }}" class="btn-icon btn-ver" title="Ver detalles">
                                                     👁️ Ver Cliente
                                                 </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

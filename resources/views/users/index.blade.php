@@ -1,4 +1,67 @@
 <style>
+ /* Select2 - Hacer que se vea como tus otros inputs */
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.375rem !important;
+        min-height: 42px !important;
+        padding: 0.5rem 0.75rem !important;
+        background-color: white !important;
+    }
+    
+    /* Opciones del dropdown */
+    .select2-results__option {
+        color: #111827 !important;
+        background-color: white !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* Opción con hover */
+    .select2-results__option--highlighted {
+        background-color: #2c4a6b !important;
+        color: white !important;
+    }
+    
+    /* Opción seleccionada en el dropdown */
+    .select2-results__option--selected {
+        background-color: #e5e7eb !important;
+        color: #111827 !important;
+    }
+    
+    /* Pills/tags de items seleccionados */
+    .select2-selection__choice {
+        background-color: #2c4a6b !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 0.25rem !important;
+        padding: 4px 8px !important;
+        margin: 2px !important;
+    }
+    
+    /* X para remover items */
+    .select2-selection__choice__remove {
+        color: white !important;
+        margin-right: 5px !important;
+    }
+    
+    .select2-selection__choice__remove:hover {
+        color: #fca5a5 !important;
+    }
+    
+    /* Placeholder */
+    .select2-selection__placeholder {
+        color: #6b7280 !important;
+    }
+    
+    /* Input de búsqueda dentro del select */
+    .select2-search__field {
+        color: #111827 !important;
+    }
+    
+    /* Dropdown container */
+    .select2-dropdown {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.375rem !important;
+    }
     .btn-primary {
             background: linear-gradient(135deg, #FCC200 0%, #f5b800 100%);
             color: #2c4a6b;
@@ -294,6 +357,8 @@
 
 <x-app-layout>
     <x-slot name="header">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -514,6 +579,30 @@
                            style="focus:ring-color: #2c4a6b;"
                            placeholder="(opcional)">
                 </div>
+                <!-- NUEVO: Clientes -->
+      
+                        <!-- Clientes - Select Múltiple NATIVO -->
+                <div id="clientesContainer">
+                    <label for="clientes" class="block text-sm font-medium text-gray-700 mb-1">
+                        Clientes <span class="text-red-500" id="clientesRequired">*</span>
+                    </label>
+                    <select name="clientes[]" 
+                            id="clientes"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                            style="focus:ring-color: #2c4a6b; height: 120px;"
+                            multiple
+                            size="5">
+                        @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id }}" class="text-gray-900 py-1">
+                                {{ $cliente->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-sm text-gray-500" id="clientesHelp">
+                        Mantén Ctrl (Cmd en Mac) para seleccionar múltiples clientes
+                    </p>
+                    <span class="text-red-500 text-xs hidden" id="error-clientes"></span>
+                </div>
             </div>
 
             {{-- Fecha de asignación (solo visible al editar) --}}
@@ -646,14 +735,15 @@
                                             </button>
 
                                             @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
-                                                <button class="btn-outline text-blue-600 hover:text-blue-800" 
-                                                        data-action="edit" data-user-id="{{ $user->id }}"
-                                                        title="Editar usuario">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                    </svg>
-                                                </button>
+                                                <button class="btn-outline text-gray-700 hover:text-blue-600 hover:border-blue-600" 
+                                                    data-action="edit" 
+                                                    data-user-id="{{ $user->id }}"
+                                                    title="Editar usuario">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                </svg>
+                                            </button>
 
                                                 <button class="btn-danger" 
                                                         data-action="delete" data-user-id="{{ $user->id }}"
@@ -683,6 +773,8 @@
 
     {{-- Modal de usuario (resto del código igual que ya lo tenías)… --}}
     {{-- … --}}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </x-app-layout>
 
 
@@ -695,6 +787,52 @@ if (document.readyState === 'loading') {
 } else {
     initUsuariosScript();
 }
+
+
+// Inicializar Select2 para clientes
+$('#clientes').select2({
+    placeholder: 'Selecciona clientes...',
+    allowClear: false,
+    closeOnSelect: false,  // ← Importante: mantener abierto al seleccionar
+    width: '100%',
+    multiple: true,  // ← Forzar modo múltiple
+    language: {
+        noResults: function() {
+            return "No se encontraron clientes";
+        }
+    }
+});
+
+// Lógica según el rol seleccionado
+$('#role').on('change', function() {
+    const role = $(this).val();
+    const $clientesSelect = $('#clientes');
+    const $clientesRequired = $('#clientesRequired');
+    const $clientesHelp = $('#clientesHelp');
+
+    if (role === 'superadmin') {
+        $clientesSelect.prop('required', false);
+        $clientesRequired.hide();
+        $clientesHelp.text('Opcional. Si no asignas clientes, tendrá acceso a todos.');
+    } else if (role === 'admin') {
+        $clientesSelect.prop('required', false);
+        $clientesRequired.hide();
+        $clientesHelp.text('Opcional. Si no asignas clientes, tendrá acceso a todos. Si asignas, solo verá esos clientes.');
+    } else if (role === 'user') {
+        $clientesSelect.prop('required', true);
+        $clientesRequired.show();
+        $clientesHelp.text('Requerido. Selecciona al menos un cliente.');
+    }
+});
+
+// Al resetear el formulario, limpiar también Select2
+function resetForm() {
+    $('#userForm')[0].reset();
+    $('#clientes').val(null).trigger('change'); // Limpiar Select2
+    $('#user_id').val('');
+    $('#formTitle').text('Agregar Usuario');
+}
+
 
 function initUsuariosScript() {
     console.log('✅ DOM cargado');
@@ -1000,68 +1138,75 @@ function initUsuariosScript() {
     // ENVIAR FORMULARIO (CREAR/EDITAR)
     // ============================================
 
-    $('#formUsuario').on('submit', function(e) {
+  $('#formUsuario').on('submit', function(e) {
+    const role = $('#role').val();
+    const clientes = $('#clientes').val();
+
+    // Solo validar para USER
+    if (role === 'user' && (!clientes || clientes.length === 0)) {
         e.preventDefault();
-        console.log('📤 Enviando formulario');
-        console.log('🔍 isEditMode:', isEditMode);
-        console.log('🔍 userId desde input:', $('#userId').val());
-        console.log('🔍 method desde input:', $('#formMethod').val());
-        clearAllErrors();
+        alert('⚠️ Los usuarios con rol "user" deben tener al menos un cliente asignado.');
+        $('#clientes').focus();
+        return false;
+    }
 
-        const formData = {
-            name: $('#name').val().trim(),
-            email: $('#email').val().trim(),
-            role: $('#role').val(),
-            phone: $('#celular').val().trim(), // ← Agregado (nota que el ID es "celular")
+    clearAllErrors();
 
-            _token: $('meta[name="csrf-token"]').attr('content')
-        };
+    // Obtener clientes seleccionados
+    const clientesSeleccionados = $('#clientes').val() || [];
+    
+    const formData = {
+        name: $('#name').val().trim(),
+        email: $('#email').val().trim(),
+        role: $('#role').val(),
+        phone: $('#celular').val().trim(),
+        clientes: clientesSeleccionados, // ← AGREGADO
+        _token: $('meta[name="csrf-token"]').attr('content')
+    };
 
-        console.log('📋 Datos del formulario:', formData);
+    console.log('📋 Datos del formulario:', formData);
+    console.log('👥 Clientes seleccionados:', clientesSeleccionados);
 
-        const method = $('#formMethod').val();
-        const userId = $('#userId').val();
-        // const url = isEditMode ? `/users/${userId}` : '/users';
-        const url = method === 'PUT' ? `/users/${userId}` : '/users';
+    const method = $('#formMethod').val();
+    const userId = $('#userId').val();
+    const url = method === 'PUT' ? `/users/${userId}` : '/users';
 
-        // Mostrar loading
-        $('#btnGuardar').prop('disabled', true);
-        $('#btnGuardarTexto').addClass('hidden');
-        $('#btnGuardarLoading').removeClass('hidden');
+    // Mostrar loading
+    $('#btnGuardar').prop('disabled', true);
+    $('#btnGuardarTexto').addClass('hidden');
+    $('#btnGuardarLoading').removeClass('hidden');
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: method === 'PUT' ? { ...formData, _method: 'PUT' } : formData,
-            success: function(response) {
-                console.log('✅ Usuario guardado:', response);
-                hideForm();
-                // showAlert('success', response.message || (isEditMode ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'));
-                showAlert('success', response.message || (method === 'PUT' ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'));
-                
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            },
-            error: function(xhr) {
-                console.error('❌ Error al guardar:', xhr);
-                $('#btnGuardar').prop('disabled', false);
-                $('#btnGuardarTexto').removeClass('hidden');
-                $('#btnGuardarLoading').addClass('hidden');
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: method === 'PUT' ? { ...formData, _method: 'PUT' } : formData,
+        success: function(response) {
+            console.log('✅ Usuario guardado:', response);
+            hideForm();
+            showAlert('success', response.message || (method === 'PUT' ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'));
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        },
+        error: function(xhr) {
+            console.error('❌ Error al guardar:', xhr);
+            $('#btnGuardar').prop('disabled', false);
+            $('#btnGuardarTexto').removeClass('hidden');
+            $('#btnGuardarLoading').addClass('hidden');
 
-                if (xhr.status === 422) {
-                    const errors = xhr.responseJSON.errors;
-                    console.log('📝 Errores de validación:', errors);
-                    $.each(errors, function(field, messages) {
-                        showFieldError(field, messages[0]);
-                    });
-                } else {
-                    showAlert('error', xhr.responseJSON?.message || 'Error al guardar el usuario');
-                }
+            if (xhr.status === 422) {
+                const errors = xhr.responseJSON.errors;
+                console.log('📝 Errores de validación:', errors);
+                $.each(errors, function(field, messages) {
+                    showFieldError(field, messages[0]);
+                });
+            } else {
+                showAlert('error', xhr.responseJSON?.message || 'Error al guardar el usuario');
             }
-        });
+        }
     });
-
+});
     // ============================================
     // ELIMINAR USUARIO
     // ============================================

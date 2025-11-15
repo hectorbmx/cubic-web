@@ -16,22 +16,24 @@ class UserManagementController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-{
-    // Verificar que el usuario tenga permisos
-    if (!auth()->user()->hasAnyRole(['superadmin', 'admin'])) {
-        abort(403, 'No tienes permisos para acceder a esta sección.');
+    {
+         
+        // Verificar que el usuario tenga permisos
+        if (!auth()->user()->hasAnyRole(['superadmin', 'admin'])) {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+           
+        $clientes = Cliente::orderBy('name')->get();
+        // Obtener usuarios con sus relaciones
+        $users = User::with(['roles', 'clientes', 'obras'])
+            ->orderBy('name')
+            ->paginate(15);
+
+        // Obtener roles disponibles para el select
+        $roles = $this->getAvailableRoles();
+
+        return view('users.index', compact('users', 'roles','clientes'));
     }
-
-    // Obtener usuarios con sus relaciones
-    $users = User::with(['roles', 'clientes', 'obras'])
-        ->orderBy('name')
-        ->paginate(15);
-
-    // Obtener roles disponibles para el select
-    $roles = $this->getAvailableRoles();
-
-    return view('users.index', compact('users', 'roles'));
-}
 
     /**
      * Show the form for creating a new resource.
@@ -49,12 +51,6 @@ class UserManagementController extends Controller
         return view('users.create', compact('roles'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    /**
- * Store a newly created resource in storage.
- */
 /**
  * Store a newly created resource in storage.
  */
@@ -68,11 +64,24 @@ public function store(Request $request)
         ], 403);
     }
 
+    // Validación base
     $request->validate([
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'role' => ['required', 'exists:roles,name'],
+        'clientes' => ['nullable', 'array'],
+        'clientes.*' => ['exists:clientes,id']
     ]);
+
+   // Validación adicional: solo USER debe tener al menos 1 cliente
+    if ($request->role === 'user') {
+        $request->validate([
+            'clientes' => ['required', 'array', 'min:1']
+        ], [
+            'clientes.required' => 'Los usuarios con rol "user" deben tener al menos un cliente asignado.',
+            'clientes.min' => 'Debes seleccionar al menos un cliente.'
+        ]);
+    }
 
     // Verificar que el usuario actual pueda asignar ese rol
     $this->checkRolePermission($request->role);
@@ -85,20 +94,42 @@ public function store(Request $request)
         $firstName = $nameParts[0];
         $lastName = $nameParts[1] ?? '';
 
-        // Crear el usuario SIN contraseña (igual que en ClienteController)
+        // Crear el usuario SIN contraseña
         $user = User::create([
             'first_name' => $firstName,
             'last_name' => $lastName,
             'name' => $request->name,
             'email' => $request->email,
-            'password' => null, // Sin contraseña hasta que acepte la invitación
-            'status' => 'invited', // Estado invited
+            'password' => null,
+            'status' => 'invited',
+            'phone' => $request->phone ?? null, // Agregar teléfono si existe
         ]);
 
         // Asignar el rol global de Spatie
         $user->assignRole($request->role);
 
-        // Generar token de invitación (DESPUÉS de crear el usuario)
+        // NUEVO: Asignar clientes si tiene
+      
+        if (!empty($request->clientes)) {
+            // Determinar rol interno basado en rol global
+            $rolInterno = match($request->role) {
+                'superadmin' => null, // SuperAdmin no necesita rol interno
+                'admin' => 'company_admin',
+                'user' => 'viewer',
+                default => 'viewer'
+            };
+            
+            foreach ($request->clientes as $clienteId) {
+                $user->clientes()->attach($clienteId, [
+                    'role' => $rolInterno,
+                    'status' => 'active',
+                    'invited_at' => now(),
+                    'invited_by_user_id' => auth()->id()
+                ]);
+            }
+        }
+
+        // Generar token de invitación
         $token = $user->generateInvitationToken();
 
         // Enviar email de invitación (descomenta cuando esté configurado)
@@ -107,6 +138,7 @@ public function store(Request $request)
         \Log::info('Invitación de usuario generada', [
             'user' => $user->email,
             'role' => $request->role,
+            'clientes' => $request->clientes ?? [],
             'token' => $token,
             'url' => route('invitation.show', ['token' => $token])
         ]);
@@ -161,6 +193,9 @@ public function edit(User $user)
         return response()->json(['message' => 'No autorizado'], 403);
     }
 
+    // Cargar relación de clientes
+    $user->load('clientes');
+
     return response()->json([
         'user' => [
             'id' => $user->id,
@@ -168,18 +203,13 @@ public function edit(User $user)
             'email' => $user->email,
             'phone' => $user->phone,
             'role' => $user->roles->first()->name ?? '',
-            
+            'clientes' => $user->clientes->pluck('id')->toArray(), // ← AGREGADO
         ],
         'roles' => $this->getAvailableRoles()
     ]);
 }
 
-    /**
-     * Update the specified resource in storage.
-     */
-/**
- * Update the specified resource in storage.
- */
+
 /**
  * Update the specified resource in storage.
  */
@@ -201,12 +231,26 @@ public function update(Request $request, User $user)
         ], 403);
     }
 
+    // Validación base
     $request->validate([
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
         'role' => ['required', 'exists:roles,name'],
-        'phone' => ['nullable', 'string', 'max:20'], // ← Agregado
+        'phone' => ['nullable', 'string', 'max:20'],
+        'clientes' => ['nullable', 'array'],
+        'clientes.*' => ['exists:clientes,id']
     ]);
+
+    // Validación adicional: si NO es superadmin, debe tener al menos 1 cliente
+    if ($request->role === 'user' && empty($request->clientes)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Los usuarios con rol "user" deben tener al menos un cliente asignado.',
+            'errors' => [
+                'clientes' => ['Debes seleccionar al menos un cliente.']
+            ]
+        ], 422);
+    }
 
     // Verificar que el usuario actual pueda asignar ese rol
     $this->checkRolePermission($request->role);
@@ -225,11 +269,39 @@ public function update(Request $request, User $user)
             'last_name' => $lastName,
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone, // ← Agregado
+            'phone' => $request->phone,
         ]);
 
         // Sincronizar rol (reemplaza el rol anterior)
         $user->syncRoles([$request->role]);
+
+        // Sincronizar clientes
+        if (!empty($request->clientes)) {
+            // Determinar rol interno basado en rol global
+            $rolInterno = match($request->role) {
+                'superadmin' => null,
+                'admin' => 'company_admin',
+                'user' => 'viewer',
+                default => 'viewer'
+            };
+            
+            $syncData = [];
+            foreach ($request->clientes as $clienteId) {
+                $existing = $user->clientes()->where('cliente_id', $clienteId)->first();
+                
+                $syncData[$clienteId] = [
+                    'role' => $existing ? $existing->pivot->role : $rolInterno,
+                    'status' => $existing ? $existing->pivot->status : 'active',
+                    'invited_at' => $existing ? $existing->pivot->invited_at : now(),
+                    'invited_by_user_id' => $existing ? $existing->pivot->invited_by_user_id : auth()->id()
+                ];
+            }
+            
+            $user->clientes()->sync($syncData);
+        } else {
+            // Si es superadmin sin clientes, desasociar todos
+            $user->clientes()->detach();
+        }
 
         DB::commit();
 
@@ -243,7 +315,8 @@ public function update(Request $request, User $user)
         
         \Log::error('Error al actualizar usuario', [
             'user_id' => $user->id,
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
 
         return response()->json([
@@ -252,7 +325,7 @@ public function update(Request $request, User $user)
         ], 500);
     }
 }
-    /**
+/**
      * Remove the specified resource from storage.
      */
     public function destroy(User $user)

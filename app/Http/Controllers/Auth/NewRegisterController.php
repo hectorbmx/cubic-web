@@ -62,7 +62,7 @@ class NewRegisterController extends Controller
             ->where('user_id', $user->id)
             ->where('status', 'invited')
             ->update([
-                'status' => 'accepted',
+                'status' => 'active',
                 'accepted_at' => now(),
                 'updated_at' => now(),
             ]);

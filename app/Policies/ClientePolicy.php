@@ -27,7 +27,7 @@ use App\Models\User;
 
     public function view(User $user, Cliente $cliente): bool
     {
-        return $user->hasAccessToCliente($cliente->id);
+        return $user->esClienteDeUsuario($cliente->id);
     }
 
     public function create(User $user): bool
