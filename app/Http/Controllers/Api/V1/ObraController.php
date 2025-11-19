@@ -9,41 +9,48 @@ use App\Models\Cliente;
 
 class ObraController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Obra::with(['cliente', 'manager']);
+ public function index(Request $request)
+{
+    $user = $request->user();
+    
+    // Obtener clientes del usuario
+    $clientesIds = $user->getClientesIds();
+    
+    // Query base filtrado por clientes del usuario
+    $query = Obra::with(['cliente', 'manager'])
+        ->whereIn('client_id', $clientesIds);
 
-        // Filtrar por estado si se proporciona
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filtrar por cliente si se proporciona
-        if ($request->has('client_id')) {
-            $query->where('client_id', $request->client_id);
-        }
-
-        $obras = $query->orderBy('created_at', 'desc')->get();
-
-        return response()->json([
-            'obras' => $obras->map(function ($obra) {
-                return [
-                    'id' => $obra->id,
-                    'clienteId' => $obra->client_id,
-                    'clienteNombre' => $obra->cliente->name ?? 'Sin cliente',
-                    'nombre' => $obra->name,
-                    'codigo' => $obra->code,
-                    'descripcion' => $obra->description,
-                    'estado' => $obra->status,
-                    'progreso' => $obra->progress_pct ?? 0,
-                    'fechaInicio' => $obra->start_date?->format('Y-m-d'),
-                    'fechaFin' => $obra->end_date?->format('Y-m-d'),
-                    'direccion' => $obra->address,
-                    'responsable' => $obra->manager->name ?? 'Sin asignar',
-                ];
-            })
-        ]);
+    // Filtrar por estado si se proporciona
+    if ($request->has('status')) {
+        $query->where('status', $request->status);
     }
+
+    // Filtrar por cliente específico si se proporciona
+    if ($request->has('client_id')) {
+        $query->where('client_id', $request->client_id);
+    }
+
+    $obras = $query->orderBy('created_at', 'desc')->get();
+
+    return response()->json([
+        'obras' => $obras->map(function ($obra) {
+            return [
+                'id' => $obra->id,
+                'clienteId' => $obra->client_id,
+                'clienteNombre' => $obra->cliente->name ?? 'Sin cliente',
+                'nombre' => $obra->name,
+                'codigo' => $obra->code,
+                'descripcion' => $obra->description,
+                'estado' => $obra->status,
+                'progreso' => $obra->progress_pct ?? 0,
+                'fechaInicio' => $obra->start_date?->format('Y-m-d'),
+                'fechaFin' => $obra->end_date?->format('Y-m-d'),
+                'direccion' => $obra->address,
+                'responsable' => $obra->manager->name ?? 'Sin asignar',
+            ];
+        })
+    ]);
+}
 
     public function show(Obra $obra)
     {

@@ -10,35 +10,31 @@ class ClienteController extends Controller
 {
     //estos funcionan antes de configurar los roles
      public function index(Request $request)
-    {
-        $user = $request->user();
+{
+    $user = $request->user();
+    
+    // Usar el método getClientesIds() que ya creamos
+    $clientesIds = $user->getClientesIds();
+    
+    // Si es SuperAdmin o Admin sin clientes, getClientesIds() devuelve todos los IDs
+    $clientes = Cliente::whereIn('id', $clientesIds)
+        ->withCount('obras')
+        ->orderBy('name')
+        ->get();
 
-        // Si es super_admin, ve todos los clientes
-        if ($user->hasRole('super_admin')) {
-            $clientes = Cliente::withCount('obras')
-                ->orderBy('name')
-                ->get();
-        } else {
-            // Si no es super_admin, solo ve los clientes a los que pertenece
-            $clientes = $user->clientes()
-                ->withCount('obras')
-                ->orderBy('name')
-                ->get();
-        }
-
-        return response()->json([
-            'clientes' => $clientes->map(function ($cliente) {
-                return [
-                    'id' => $cliente->id,
-                    'nombre' => $cliente->name,
-                    'email' => $cliente->email,
-                    'telefono' => $cliente->phone ?? null,
-                    'direccion' => $cliente->address ?? null,
-                    'obrasActivas' => $cliente->obras_count,
-                ];
-            })
-        ]);
-    }
+    return response()->json([
+        'clientes' => $clientes->map(function ($cliente) {
+            return [
+                'id' => $cliente->id,
+                'nombre' => $cliente->name,
+                'email' => $cliente->email,
+                'telefono' => $cliente->phone ?? null,
+                'direccion' => $cliente->address ?? null,
+                'obrasActivas' => $cliente->obras_count,
+            ];
+        })
+    ]);
+}
 
     public function show(Request $request, Cliente $cliente)
     {
