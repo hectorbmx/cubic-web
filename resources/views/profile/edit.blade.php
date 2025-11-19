@@ -103,7 +103,7 @@
     {{-- === HEADER COMPACTO === --}}
     <x-slot name="header">
         <div class="page-hero">
-            <h2>👤 Perfil de Usuario</h2>
+            <h2>👤 Perfil de Usuario </h2>
             <p>Completa tu información personal para acceder a todas las funciones del sistema.</p>
         </div>
     </x-slot>
@@ -180,11 +180,11 @@
         </div>
 
         <div class="form-group">
-            <label for="position">Puesto en la empresa</label>
-            <input id="position" name="position" type="text"
-                   value="{{ old('position', $user->position ?? auth()->user()->position) }}"
-                   class="input">
-            @error('position') <div class="error">{{ $message }}</div> @enderror
+            <label for="role">Puesto en la empresa</label>
+            <input id="role" name="role" type="text"
+            value="{{ old('role', $clienteRole) }}"
+            class="input">
+            @error('role') <div class="error">{{ $message }}</div> @enderror
         </div>
 
     </div>

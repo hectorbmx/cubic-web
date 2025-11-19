@@ -14,41 +14,37 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
+ public function edit(Request $request): View
+{
+    $user = $request->user();
 
-    /**
-     * Update the user's profile information.
-     */
-    // public function update(ProfileUpdateRequest $request): RedirectResponse
-    // {
-    //     $request->user()->fill($request->validated());
+    // Toma el primer registro de cliente_user del usuario
+    $cliente = $user->clientes()->first();
+    $clienteRole = $cliente?->pivot->role; // null safe
 
-    //     if ($request->user()->isDirty('email')) {
-    //         $request->user()->email_verified_at = null;
-    //     }
+    return view('profile.edit', [
+        'user'        => $user,
+        'clienteRole' => $clienteRole,
+    ]);
+}
 
-    //     $request->user()->save();
 
-    //     return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    // }
+
     public function update(ProfileUpdateRequest $request): RedirectResponse
 {
     $user = $request->user();
 
+   
     // Solo campos permitidos
     $data = $request->only([
         'name',
         'first_name',
         'last_name',
         'phone',
-        'position',
+        // 'position',
         'email',
-        'avatar'
+        'avatar',
+        'role'
     ]);
      // Si sube una nueva imagen
     if ($request->hasFile('avatar')) {
@@ -70,6 +66,15 @@ class ProfileController extends Controller
     // Guardar los cambios
     $user->fill($data);
     $user->save();
+
+
+    $cliente = $user->clientes()->first();   // <- aquí obtenemos el cliente
+    if ($cliente && $request->filled('role')) {
+        $user->clientes()->updateExistingPivot($cliente->id, [
+            'role' => $request->input('role'),
+        ]);
+    }
+
 
     return Redirect::route('profile.edit')->with('status', 'profile-updated');
 }
