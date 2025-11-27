@@ -1,50 +1,92 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Obra;
 use Illuminate\Http\Request;
-use App\Models\Cliente;
 
 class ObraController extends Controller
 {
+    /**
+     * Listado principal de obras (GET /works)
+     */
     public function index(Request $request)
     {
-        $query = Obra::with(['cliente', 'manager']);
+        [$obras, $stats] = $this->buildObrasAndStats($request);
 
-        // Filtrar por estado si se proporciona
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filtrar por cliente si se proporciona
-        if ($request->has('client_id')) {
-            $query->where('client_id', $request->client_id);
-        }
-
-        $obras = $query->orderBy('created_at', 'desc')->get();
-
-        return response()->json([
-            'obras' => $obras->map(function ($obra) {
-                return [
-                    'id' => $obra->id,
-                    'clienteId' => $obra->client_id,
-                    'clienteNombre' => $obra->cliente->name ?? 'Sin cliente',
-                    'nombre' => $obra->name,
-                    'codigo' => $obra->code,
-                    'descripcion' => $obra->description,
-                    'estado' => $obra->status,
-                    'progreso' => $obra->progress_pct ?? 0,
-                    'fechaInicio' => $obra->start_date?->format('Y-m-d'),
-                    'fechaFin' => $obra->end_date?->format('Y-m-d'),
-                    'direccion' => $obra->address,
-                    'responsable' => $obra->manager->name ?? 'Sin asignar',
-                ];
-            })
-        ]);
+        return view('works.index', compact('obras', 'stats'));
     }
 
+    /**
+     * Búsqueda / filtros (GET /works/search)
+     * Usa exactamente la misma lógica que index.
+     */
+    public function search(Request $request)
+    {
+        [$obras, $stats] = $this->buildObrasAndStats($request);
+
+        return view('works.index', compact('obras', 'stats'));
+    }
+
+    /**
+     * Construye el query de obras + estadísticas para el header
+     */
+    private function buildObrasAndStats(Request $request): array
+    {
+        // --- Query base para el listado ---
+        $query = Obra::with(['cliente', 'manager']);
+
+        // 🔍 Búsqueda por nombre, código o dirección
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('code', 'like', '%' . $search . '%')
+                  ->orWhere('address', 'like', '%' . $search . '%');
+            });
+        }
+
+        // 🎯 Filtro por estado
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        // 🏢 Filtro por cliente
+        if ($clientId = $request->input('client_id')) {
+            $query->where('client_id', $clientId);
+        }
+
+        // Si quieres limitar por clientes asignados al usuario, podrías hacer algo tipo:
+        // $clientesIds = $request->user()->getClientesIds();
+        // $query->whereIn('client_id', $clientesIds);
+
+        // Listado paginado (mantiene los filtros en la URL)
+        $obras = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        // --- Estadísticas del header ---
+        // Aquí las hago globales; si quieres que respeten algún filtro,
+        // se puede ajustar fácil.
+        $statsBase = Obra::query();
+
+        $stats = [
+            'total'       => (clone $statsBase)->count(),
+            'planning'    => (clone $statsBase)->where('status', 'planning')->count(),
+            'in_progress' => (clone $statsBase)->where('status', 'in_progress')->count(),
+            'paused'      => (clone $statsBase)->where('status', 'paused')->count(),
+            'completed'   => (clone $statsBase)->where('status', 'completed')->count(),
+            // si luego quieres mostrar 'cancelled', se puede agregar aquí
+        ];
+
+        return [$obras, $stats];
+    }
+
+    /**
+     * Detalle de una obra (GET /works/{obra})
+     * (esto ya lo tienes, pero lo pongo por si acaso)
+     */
     public function show(Obra $obra)
     {
         $obra->load([
@@ -55,124 +97,9 @@ class ObraController extends Controller
             'planos',
             'contratos',
             'fotos',
-            'informes'
+            'informes',
         ]);
 
-        return response()->json([
-            'obra' => [
-                'id' => $obra->id,
-                'codigo' => $obra->code,
-                'nombre' => $obra->name,
-                'descripcion' => $obra->description,
-                'estado' => $obra->status,
-                'progreso' => $obra->progress_pct ?? 0,
-                'fechaInicio' => $obra->start_date?->format('Y-m-d'),
-                'fechaFin' => $obra->end_date?->format('Y-m-d'),
-                'direccion' => $obra->address,
-                'lat' => $obra->lat,
-                'lng' => $obra->lng,
-                'presupuesto' => $obra->budget_amount,
-                'moneda' => $obra->currency,
-                
-                // Cliente
-                'cliente' => [
-                    'id' => $obra->cliente->id ?? null,
-                    'nombre' => $obra->cliente->name ?? 'Sin cliente',
-                    'email' => $obra->cliente->email ?? null,
-                ],
-                
-                // Responsable
-                'responsable' => [
-                    'id' => $obra->manager->id ?? null,
-                    'nombre' => $obra->manager->name ?? 'Sin asignar',
-                    'email' => $obra->manager->email ?? null,
-                ],
-                
-                // Detalles/Historial
-                'detalles' => $obra->detalles->map(function ($detalle) {
-                    return [
-                        'id' => $detalle->id,
-                        'titulo' => $detalle->title ?? $detalle->nombre ?? '',
-                        'descripcion' => $detalle->description ?? $detalle->descripcion ?? '',
-                        'fecha' => $detalle->created_at->format('Y-m-d H:i:s'),
-                    ];
-                }),
-                
-                // Cámaras
-                'camaras' => $obra->camaras->map(function ($camara) {
-                    return [
-                        'id' => $camara->id,
-                        'nombre' => $camara->name ?? $camara->nombre ?? '',
-                        'url' => $camara->url ?? $camara->stream_url ?? '',
-                        'activa' => $camara->is_active ?? true,
-                    ];
-                }),
-                
-                // Planos
-                'planos' => $obra->planos->map(function ($plano) {
-                    return [
-                        'id' => $plano->id,
-                        'nombre' => $plano->name ?? $plano->nombre ?? '',
-                        'url' => $plano->file_path ?? $plano->url ?? '',
-                        'fecha' => $plano->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
-                // Contratos
-                'contratos' => $obra->contratos->map(function ($contrato) {
-                    return [
-                        'id' => $contrato->id,
-                        'nombre' => $contrato->name ?? $contrato->nombre ?? '',
-                        'url' => $contrato->file_path ?? $contrato->url ?? '',
-                        'fecha' => $contrato->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
-                // Fotos
-                'fotos' => $obra->fotos->map(function ($foto) {
-                     $baseUrl = config('app.url'); 
-                    return [
-                        'id' => $foto->id,
-                        'url' => $foto->file_path ?? $foto->url ?? '',
-                        'thumbnail' => $foto->thumbnail_path ?? $foto->url ?? '',
-                        'descripcion' => $foto->description ?? $foto->descripcion ?? '',
-                        'fecha' => $foto->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
-                // Informes
-                'informes' => $obra->informes->map(function ($informe) {
-                    return [
-                        'id' => $informe->id,
-                        'titulo' => $informe->title ?? $informe->titulo ?? '',
-                        'fecha' => $informe->week_start ?? $informe->fecha ?? $informe->created_at->format('Y-m-d'),
-                        'progreso' => $informe->progress_pct ?? 0,
-                    ];
-                }),
-            ]
-        ]);
-    }
- public function byCliente(Request $request, $clienteId)
-    {
-        $user = $request->user();
-
-    
-        $isSuperAdmin = $user?->role === 'superadmin';
-        $assignedClientIds = $user?->clientes()->pluck('clientes.id')->toArray() ?? [];
-
-        if (!$isSuperAdmin && !in_array((int)$clienteId, $assignedClientIds, true)) {
-            return response()->json([
-                'message' => 'No autorizado para ver obras de este cliente.',
-            ], 403);
-        }
-
-        $obras = Obra::query()
-            ->where('client_id', $clienteId)
-            ->latest('id')
-            ->get();
-
-        return response()->json([
-            'data' => $obras,
-        ], 200);
+        return view('works.show', compact('obra'));
     }
 }

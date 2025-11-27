@@ -41,7 +41,7 @@ class ClienteController extends Controller
         $user = $request->user();
 
         // Verificar que el usuario tenga acceso a este cliente
-        if (!$user->hasRole('super_admin') && !$user->clientes->contains($cliente->id)) {
+        if (!$user->hasRole('superadmin') && !$user->clientes->contains($cliente->id)) {
             return response()->json([
                 'message' => 'No tienes acceso a este cliente'
             ], 403);
