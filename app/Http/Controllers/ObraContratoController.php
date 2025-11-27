@@ -38,12 +38,18 @@ class ObraContratoController extends Controller
             // Cargar la relación uploadedBy
             $contrato->load('uploadedBy');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Contrato subido exitosamente',
-                'contrato' => $contrato
-            ]);
+            if ($request->expectsJson() || $request->ajax()) {
+    return response()->json([
+        'success'  => true,
+        'message'  => 'Contrato subido exitosamente',
+        'contrato' => $contrato,
+    ]);
+}
 
+// Flujo normal del panel web:
+return redirect()
+    ->route('obras.show', $obra)   // o la ruta que uses para ver la obra
+    ->with('success', 'Contrato subido exitosamente');
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -699,6 +699,7 @@
                                             </div>
                                         @endif
                                     </label>
+                                    
                                 </div>
                             @empty
                                 <div class="empty-state">
@@ -706,14 +707,7 @@
                                     <p>No hay obras disponibles para asignar</p>
                                 </div>
                             @endforelse
-                        </div>
-                        <small style="color: #6b7280; font-size: 13px; margin-top: 0.5rem; display: block;">
-                            Las obras marcadas en verde ya están asignadas
-                        </small>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
+                               <div class="modal-footer">
                     <button type="button" onclick="closeModal()" class="btn-secondary">
                         Cancelar
                     </button>
@@ -721,6 +715,16 @@
                         ✓ Asignar Obras Seleccionadas
                     </button>
                 </div>
+                        </div>
+                        
+                        <small style="color: #6b7280; font-size: 13px; margin-top: 0.5rem; display: block;">
+                            Las obras marcadas en verde ya están asignadas
+                        </small>
+                    </div>
+                    
+                </div>
+
+             
             </form>
         </div>
     </div>

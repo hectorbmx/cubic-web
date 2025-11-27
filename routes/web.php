@@ -137,4 +137,7 @@ Route::middleware('auth')->group(function () {
     // Obras de usuario
     Route::get('/usuarios/{user}/obras', [App\Http\Controllers\UserController::class, 'obras'])->name('usuarios.obras');
     Route::post('/usuarios/{user}/obras/asignar', [App\Http\Controllers\UserController::class, 'asignarObras'])->name('usuarios.obras.asignar');
+       // Actualizar obras asignadas
+    Route::post('/users/{user}/obras', [UserManagementController::class, 'updateObras'])
+        ->name('users.updateObras');
 });

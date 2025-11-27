@@ -348,7 +348,7 @@
                 ➕ Nueva Obra
             </a>
             @endif
-            <a href="{{ route('works.dashboard') }}" class="btn btn-secondary">
+            <a href="{{ route('dashboard') }}" class="btn btn-secondary">
                 📊 Dashboard
             </a>
         </div>

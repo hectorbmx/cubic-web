@@ -1,68 +1,52 @@
-<style>
- /* Select2 - Hacer que se vea como tus otros inputs */
-    .select2-container--default .select2-selection--multiple {
-        border: 1px solid #d1d5db !important;
-        border-radius: 0.375rem !important;
-        min-height: 42px !important;
-        padding: 0.5rem 0.75rem !important;
-        background-color: white !important;
-    }
-    
-    /* Opciones del dropdown */
-    .select2-results__option {
-        color: #111827 !important;
-        background-color: white !important;
-        padding: 8px 12px !important;
-    }
-    
-    /* Opción con hover */
-    .select2-results__option--highlighted {
-        background-color: #2c4a6b !important;
-        color: white !important;
-    }
-    
-    /* Opción seleccionada en el dropdown */
-    .select2-results__option--selected {
-        background-color: #e5e7eb !important;
-        color: #111827 !important;
-    }
-    
-    /* Pills/tags de items seleccionados */
-    .select2-selection__choice {
-        background-color: #2c4a6b !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 0.25rem !important;
-        padding: 4px 8px !important;
-        margin: 2px !important;
-    }
-    
-    /* X para remover items */
-    .select2-selection__choice__remove {
-        color: white !important;
-        margin-right: 5px !important;
-    }
-    
-    .select2-selection__choice__remove:hover {
-        color: #fca5a5 !important;
-    }
-    
-    /* Placeholder */
-    .select2-selection__placeholder {
-        color: #6b7280 !important;
-    }
-    
-    /* Input de búsqueda dentro del select */
-    .select2-search__field {
-        color: #111827 !important;
-    }
-    
-    /* Dropdown container */
-    .select2-dropdown {
-        border: 1px solid #d1d5db !important;
-        border-radius: 0.375rem !important;
-    }
-    .btn-primary {
+<x-app-layout>
+    <style>
+        /* --- TUS ESTILOS EXISTENTES --- */
+        /* (copio los que ya tenías tal cual) */
+
+        /* Select2... */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.375rem !important;
+            min-height: 42px !important;
+            padding: 0.5rem 0.75rem !important;
+            background-color: white !important;
+        }
+        .select2-results__option {
+            color: #111827 !important;
+            background-color: white !important;
+            padding: 8px 12px !important;
+        }
+        .select2-results__option--highlighted {
+            background-color: #2c4a6b !important;
+            color: white !important;
+        }
+        .select2-results__option--selected {
+            background-color: #e5e7eb !important;
+            color: #111827 !important;
+        }
+        .select2-selection__choice {
+            background-color: #2c4a6b !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 0.25rem !important;
+            padding: 4px 8px !important;
+            margin: 2px !important;
+        }
+        .select2-selection__choice__remove {
+            color: white !important;
+            margin-right: 5px !important;
+        }
+        .select2-selection__choice__remove:hover {
+            color: #fca5a5 !important;
+        }
+        .select2-selection__placeholder { color: #6b7280 !important; }
+        .select2-search__field { color: #111827 !important; }
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.375rem !important;
+        }
+
+        .btn-primary {
             background: linear-gradient(135deg, #FCC200 0%, #f5b800 100%);
             color: #2c4a6b;
             padding: 0.75rem 1.5rem;
@@ -78,12 +62,10 @@
             gap: 0.5rem;
             transition: all 0.3s ease;
         }
-
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(252, 194, 0, 0.35);
         }
-        
         .btn-secondary {
             background: white;
             color: #2c4a6b;
@@ -98,10 +80,7 @@
             gap: 0.5rem;
             transition: all 0.2s ease;
         }
-
-        .btn-secondary:hover {
-            background: #f3f4f6;
-        }
+        .btn-secondary:hover { background: #f3f4f6; }
 
         .btn-danger {
             background-color: #e11d48;
@@ -113,10 +92,7 @@
             align-items: center;
             gap: 0.25rem;
         }
-
-        .btn-danger:hover {
-            background-color: #be123c;
-        }
+        .btn-danger:hover { background-color: #be123c; }
 
         .btn-outline {
             border-radius: 9999px;
@@ -127,35 +103,7 @@
             align-items: center;
             gap: 0.25rem;
         }
-
-        .btn-outline:hover {
-            background-color: #f3f4f6;
-        }
-
-        .filter-pill {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .filter-pill.active {
-            background-color: #2c4a6b;
-            color: white;
-        }
-
-        .filter-pill.inactive {
-            background-color: #f3f4f6;
-            color: #4b5563;
-        }
-
-        .filter-pill.inactive:hover {
-            border-color: #d1d5db;
-        }
+        .btn-outline:hover { background-color: #f3f4f6; }
 
         .input-search {
             border-radius: 9999px;
@@ -164,13 +112,11 @@
             font-size: 14px;
             width: 100%;
         }
-
         .input-search:focus {
             outline: none;
             border-color: #2c4a6b;
             box-shadow: 0 0 0 1px #2c4a6b;
         }
-
         .search-icon {
             position: absolute;
             right: 0.75rem;
@@ -179,119 +125,27 @@
             color: #9ca3af;
         }
 
-        .status-pill {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .status-pill.active {
-            background-color: #ecfdf3;
-            color: #15803d;
-        }
-
-        .status-pill.inactive {
-            background-color: #fef2f2;
-            color: #b91c1c;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 42px;
-            height: 22px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #e5e7eb;
             transition: .3s;
             border-radius: 9999px;
         }
-
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 2px;
-            bottom: 2px;
+            height: 18px; width: 18px;
+            left: 2px; bottom: 2px;
             background-color: white;
             transition: .3s;
             border-radius: 9999px;
         }
-
-        input:checked + .slider {
-            background-color: #2c4a6b;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        .badge-pill {
-            border-radius: 9999px;
-            padding: 0.25rem 0.75rem;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .badge-pill span {
-            white-space: nowrap;
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 160px;
-            background-color: #111827;
-            color: #f9fafb;
-            text-align: center;
-            border-radius: 6px;
-            padding: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -80px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal-backdrop-custom {
-            background-color: rgba(15, 23, 42, 0.65);
-        }
-
-        .modal-panel {
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
-        }
+        input:checked + .slider { background-color: #2c4a6b; }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         .avatar-circle {
             border-radius: 9999px;
@@ -303,25 +157,6 @@
             font-size: 14px;
         }
 
-        .avatar-circle span {
-            letter-spacing: 0.03em;
-        }
-
-        .filter-badge {
-            border-radius: 9999px;
-            padding: 0.25rem 0.75rem;
-            font-size: 12px;
-            border: 1px solid #d1d5db;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .filter-badge span {
-            white-space: nowrap;
-        }
-
-        /* Badges de rol */
         .role-badge {
             display: inline-flex;
             align-items: center;
@@ -333,451 +168,481 @@
             line-height: 1.25rem;
             white-space: nowrap;
         }
+        .role-superadmin { background:#F3E8FF; color:#6B21A8; }
+        .role-admin      { background:#2c4a6b; color:#fff;    }
+        .role-user       { background:#E5E7EB; color:#111827; }
+        .role-none       { background:#F3F4F6; color:#4B5563; }
 
-        .role-superadmin {
-            background-color: #F3E8FF; /* purple-100 */
-            color: #6B21A8; /* purple-800 */
+        /* --- NUEVO: layout tipo “hero” igual que Clientes/Obras --- */
+        .usuarios-page {
+            background: #f5f7fa;
+            min-height: 100vh;
+            font-family: 'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
         }
-
-        .role-admin {
-            background-color: #2c4a6b;
-            color: #ffffff;
+        .page-hero {
+            background: linear-gradient(135deg, #2c4a6b 0%, #1e3449 100%);
+            padding: 1.75rem 2rem;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
-
-        .role-user {
-            background-color: #E5E7EB; /* gray-200 */
-            color: #111827; /* gray-900 */
+        .page-hero-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
         }
-
-        .role-none {
-            background-color: #F3F4F6; /* gray-100 */
-            color: #4B5563; /* gray-600 */
+        .page-hero-title p {
+            font-size: 14px;
+            margin-top: 0.25rem;
+            opacity: .9;
         }
-</style>
+        .card-filters,
+        .card-table {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .card-table { padding: 0; }
+    </style>
 
-<x-app-layout>
-    <x-slot name="header">
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- Deja vacío el header de Jetstream para que no duplique el título --}}
+    <x-slot name="header"></x-slot>
 
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Gestión de Usuarios') }}
-                </h2>
-                <p class="mt-1 text-sm text-gray-600">
-                    Administra los usuarios del sistema, sus roles, permisos y asignaciones de clientes y obras.
-                </p>
-            </div>
-            @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
-                <button id="btnOpenModal" 
-                    class="btn-primary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Agregar Usuario
-                </button>
-            @endif
-        </div>
-    </x-slot>
+    <div class="usuarios-page">
+        <div class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            {{-- Mensajes de éxito/error --}}
-            <div id="alertSuccess" class="hidden mb-4 rounded-md bg-green-50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L9 13.414l4.707-4.707z" clip-rule="evenodd" />
-                        </svg>
+                {{-- HERO PRINCIPAL --}}
+                <div class="page-hero">
+                    <div class="page-hero-title">
+                        <h1>Gestión de Usuarios</h1>
+                        <p>Administra los usuarios del sistema, sus roles, permisos y asignaciones de clientes y obras.</p>
                     </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800" id="alertSuccessMessage">
-                            Acción realizada correctamente.
-                        </p>
-                    </div>
-                </div>
-            </div>
 
-            <div id="alertError" class="hidden mb-4 rounded-md bg-red-50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 112 0 1 1 0 01-2 0zm0-6a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-red-800" id="alertErrorMessage">
-                            Ocurrió un error al procesar la solicitud.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Filtros y búsqueda --}}
-            <div class="mb-6 bg-white shadow-sm sm:rounded-lg p-4">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div class="filter-badge">
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Filtros activos</span>
-                            <span id="activeFiltersCount" class="text-xs font-semibold text-indigo-600">0</span>
-                        </div>
-
-                        <button id="btnResetFilters" class="btn-secondary">
+                    @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
+                        <button id="btnOpenModal" class="btn-primary">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M4 20v-5h.581m15.356-2a8.003 8.003 0 01-15.356 2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 4v16m8-8H4"/>
                             </svg>
-                            Limpiar filtros
+                            Agregar Usuario
                         </button>
-                    </div>
+                    @endif
+                </div>
 
-                    <div class="flex flex-col md:flex-row gap-4 md:items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="tooltip">
-                                <label class="switch">
-                                    <input type="checkbox" id="filterHasRole">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="ml-2 text-sm text-gray-700">Solo con rol asignado</span>
-                                <span class="tooltiptext">Muestra solo usuarios que tienen al menos un rol asignado.</span>
-                            </div>
-
-                            <div class="tooltip">
-                                <label class="switch">
-                                    <input type="checkbox" id="filterHasClients">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="ml-2 text-sm text-gray-700">Con clientes asignados</span>
-                                <span class="tooltiptext">Filtra usuarios que ya tienen uno o más clientes asociados.</span>
-                            </div>
-
-                            <div class="tooltip">
-                                <label class="switch">
-                                    <input type="checkbox" id="filterHasObras">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="ml-2 text-sm text-gray-700">Con obras asignadas</span>
-                                <span class="tooltiptext">Muestra usuarios que tienen al menos una obra asignada.</span>
-                            </div>
+                {{-- ALERTAS --}}
+                <div id="alertSuccess" class="hidden mb-4 rounded-md bg-green-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L9 13.414l4.707-4.707z"
+                                      clip-rule="evenodd"/>
+                            </svg>
                         </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-green-800" id="alertSuccessMessage">
+                                Acción realizada correctamente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="relative w-full md:w-64">
-                            <input type="text" id="searchUser" class="input-search" placeholder="Buscar por nombre o email...">
-                            <span class="search-icon">
+                <div id="alertError" class="hidden mb-4 rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 112 0 1 1 0 01-2 0zm0-6a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-red-800" id="alertErrorMessage">
+                                Ocurrió un error al procesar la solicitud.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- CARD DE FILTROS --}}
+                <div class="card-filters">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="filter-badge">
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                    Filtros activos
+                                </span>
+                                <span id="activeFiltersCount" class="text-xs font-semibold text-indigo-600">0</span>
+                            </div>
+
+                            <button id="btnResetFilters" class="btn-secondary">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M4 20v-5h.581m15.356-2a8.003 8.003 0 01-15.356 2"/>
                                 </svg>
-                            </span>
+                                Limpiar filtros
+                            </button>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            {{-- Tabla de usuarios --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                {{-- Tabla de usuarios estilo Bootstrap --}}
-                <div class="overflow-x-auto w-full">
-                    <table class="min-w-full w-full border border-gray-200">
-                        <thead style="background-color: #2c4a6b;">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
-                                    Nombre
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
-                                    Email
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
-                                    Rol
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
-                                    Clientes
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
-                                    Obras
-                                </th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
-                                    Acciones
-                                </th>
-                            </tr>
-                        </thead>
-                        {{-- Formulario colapsable para Crear/Editar Usuario --}}
-<div id="formContainer" class="hidden bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-    <div class="p-6 text-gray-900">
-        {{-- Header del Formulario --}}
-        <div class="flex justify-between items-center pb-4 mb-4 border-b-2" style="border-color: #2c4a6b;">
-            <h3 class="text-lg font-semibold" style="color: #2c4a6b;" id="formTitulo">Agregar Usuario</h3>
-            <button id="btnCerrarForm" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-
-        {{-- Formulario --}}
-        <form id="formUsuario">
-            @csrf
-            <input type="hidden" id="userId" name="user_id">
-            <input type="hidden" id="formMethod" value="POST">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{-- Nombre --}}
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                        Nombre completo <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           id="name" 
-                           name="name" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                           style="focus:ring-color: #2c4a6b;"
-                           placeholder="Nombre completo">
-                    <span class="text-red-500 text-xs hidden" id="error-name"></span>
-                </div>
-
-                {{-- Rol --}}
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
-                        Rol <span class="text-red-500">*</span>
-                    </label>
-                    <select id="role" 
-                            name="role" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                            style="focus:ring-color: #2c4a6b;">
-                        <option value="">Seleccionar rol</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
-                        @endforeach
-                    </select>
-                    <span class="text-red-500 text-xs hidden" id="error-role"></span>
-                </div>
-
-                {{-- Email --}}
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                        Email <span class="text-red-500">*</span>
-                    </label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                           style="focus:ring-color: #2c4a6b;"
-                           placeholder="email@ejemplo.com">
-                    <span class="text-red-500 text-xs hidden" id="error-email"></span>
-                </div>
-
-                {{-- Celular (opcional) --}}
-                <div>
-                    <label for="celular" class="block text-sm font-medium text-gray-700 mb-1">
-                        Celular
-                    </label>
-                    <input type="tel" 
-                           id="celular" 
-                           name="celular" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                           style="focus:ring-color: #2c4a6b;"
-                           placeholder="(opcional)">
-                </div>
-                <!-- NUEVO: Clientes -->
-      
-                        <!-- Clientes - Select Múltiple NATIVO -->
-                <div id="clientesContainer">
-                    <label for="clientes" class="block text-sm font-medium text-gray-700 mb-1">
-                        Clientes <span class="text-red-500" id="clientesRequired">*</span>
-                    </label>
-                    <select name="clientes[]" 
-                            id="clientes"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                            style="focus:ring-color: #2c4a6b; height: 120px;"
-                            multiple
-                            size="5">
-                        @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->id }}" class="text-gray-900 py-1">
-                                {{ $cliente->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="mt-1 text-sm text-gray-500" id="clientesHelp">
-                        Mantén Ctrl (Cmd en Mac) para seleccionar múltiples clientes
-                    </p>
-                    <span class="text-red-500 text-xs hidden" id="error-clientes"></span>
-                </div>
-            </div>
-
-            {{-- Fecha de asignación (solo visible al editar) --}}
-            <div id="fechaAsignacionContainer" class="hidden mt-4">
-                <label for="fecha_asignacion" class="block text-sm font-medium text-gray-700 mb-1">
-                    Fecha de asignación
-                </label>
-                <input type="date" 
-                       id="fecha_asignacion" 
-                       name="fecha_asignacion" 
-                       class="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
-                       style="focus:ring-color: #2c4a6b;">
-            </div>
-
-            {{-- Botones --}}
-                                <div class="flex justify-end space-x-2 mt-6 pt-4 border-t border-gray-200">
-                                    <button type="button" 
-                                            id="btnCancelar"
-                                            class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors font-medium">
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" 
-                                            id="btnGuardar"
-                                            class="px-6 py-2 text-white rounded-md hover:opacity-90 transition-colors font-medium"
-                                            style="background-color: #2c4a6b;">
-                                        <span id="btnGuardarTexto">Guardar</span>
-                                        <span id="btnGuardarLoading" class="hidden">
-                                            <svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Guardando...
-                                        </span>
-                                    </button>
+                        <div class="flex flex-col md:flex-row gap-4 md:items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center">
+                                    <label class="switch">
+                                        <input type="checkbox" id="filterHasRole">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="ml-2 text-sm text-gray-700">Solo con rol asignado</span>
                                 </div>
-                            </form>
+
+                                <div class="flex items-center">
+                                    <label class="switch">
+                                        <input type="checkbox" id="filterHasClients">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="ml-2 text-sm text-gray-700">Con clientes asignados</span>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <label class="switch">
+                                        <input type="checkbox" id="filterHasObras">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="ml-2 text-sm text-gray-700">Con obras asignadas</span>
+                                </div>
+                            </div>
+
+                            <div class="relative w-full md:w-64">
+                                <input type="text" id="searchUser" class="input-search"
+                                       placeholder="Buscar por nombre o email...">
+                                <span class="search-icon">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                        <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
-                            @forelse ($users as $user)
-                                <tr class="hover:bg-gray-50 transition-colors duration-150" data-user-id="{{ $user->id }}">
-                                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <div class="h-10 w-10 avatar-circle text-white font-medium text-sm" 
-                                                     style="background-color: #2c4a6b;">
-                                                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                                                </div>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $user->name }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
-                                        <div class="text-sm text-gray-900">{{ $user->email }}</div>
-                                    </td>
-
-                                    {{-- Columna Rol con badge --}}
-                                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
-                                        @php
-                                            $roleName = $user->roles->first()->name ?? null;
-                                            $roleKey = $roleName ? strtolower($roleName) : null;
-                                        @endphp
-
-                                        @if($roleKey === 'superadmin')
-                                            <span class="role-badge role-superadmin">
-                                                Superadmin
-                                            </span>
-                                        @elseif($roleKey === 'admin')
-                                            <span class="role-badge role-admin">
-                                                Admin
-                                            </span>
-                                        @elseif($roleKey)
-                                            <span class="role-badge role-user">
-                                                {{ ucfirst($roleName) }}
-                                            </span>
-                                        @else
-                                            <span class="role-badge role-none">
-                                                Sin rol
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-6 py-4 border-r border-gray-200">
-                                        @if($user->clientes->isNotEmpty())
-                                            <div class="text-sm text-gray-900 font-medium">
-                                                {{ $user->clientes->count() }} 
-                                                {{ Str::plural('cliente', $user->clientes->count()) }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                {{ $user->clientes->pluck('nombre')->take(2)->implode(', ') }}
-                                                @if($user->clientes->count() > 2)
-                                                    <span class="text-gray-400">+{{ $user->clientes->count() - 2 }} más</span>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <span class="text-xs text-gray-400 italic">Sin clientes</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 border-r border-gray-200">
-                                        @if($user->obras->isNotEmpty())
-                                            <div class="text-sm text-gray-900 font-medium">
-                                                {{ $user->obras->count() }} 
-                                                {{ Str::plural('obra', $user->obras->count()) }}
-                                            </div>
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                {{ $user->obras->pluck('nombre')->take(2)->implode(', ') }}
-                                                @if($user->obras->count() > 2)
-                                                    <span class="text-gray-400">+{{ $user->obras->count() - 2 }} más</span>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <span class="text-xs text-gray-400 italic">Sin obras</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <div class="flex items-center justify-center space-x-3">
-                                            <button class="btn-outline text-gray-600 hover:text-gray-900" 
-                                                    data-action="view" data-user-id="{{ $user->id }}" 
-                                                    title="Ver detalles del usuario">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg>
-                                            </button>
-
-                                            @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
-                                                <button class="btn-outline text-gray-700 hover:text-blue-600 hover:border-blue-600" 
-                                                    data-action="edit" 
-                                                    data-user-id="{{ $user->id }}"
-                                                    title="Editar usuario">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                </svg>
-                                            </button>
-
-                                                <button class="btn-danger" 
-                                                        data-action="delete" data-user-id="{{ $user->id }}"
-                                                        title="Eliminar usuario">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4-4h.01" />
-                                                    </svg>
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                                        No hay usuarios registrados aún.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
                 </div>
+
+                {{-- CARD con FORM + TABLA --}}
+              {{-- CARD con FORM + TABLA --}}
+<div class="card-table">
+
+    {{-- FORM colapsable (fuera de la tabla) --}}
+    <div id="formContainer" class="hidden border-b border-gray-100">
+        <div class="p-6 text-gray-900">
+            {{-- header form --}}
+            <div class="flex justify-between items-center pb-4 mb-4 border-b-2" style="border-color:#2c4a6b;">
+                <h3 class="text-lg font-semibold" style="color:#2c4a6b;" id="formTitulo">Agregar Usuario</h3>
+                <button id="btnCerrarForm" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
+
+            {{-- FORMULARIO --}}
+            <form id="formUsuario">
+                @csrf
+                <input type="hidden" id="userId" name="user_id">
+                <input type="hidden" id="formMethod" value="POST">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Nombre --}}
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nombre completo <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="name"
+                               name="name"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                               style="focus:ring-color: #2c4a6b;"
+                               placeholder="Nombre completo">
+                        <span class="text-red-500 text-xs hidden" id="error-name"></span>
+                    </div>
+
+                    {{-- Rol --}}
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
+                            Rol <span class="text-red-500">*</span>
+                        </label>
+                        <select id="role"
+                                name="role"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                                style="focus:ring-color: #2c4a6b;">
+                            <option value="">Seleccionar rol</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                            @endforeach
+                        </select>
+                        <span class="text-red-500 text-xs hidden" id="error-role"></span>
+                    </div>
+
+                    {{-- Email --}}
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                               style="focus:ring-color: #2c4a6b;"
+                               placeholder="email@ejemplo.com">
+                        <span class="text-red-500 text-xs hidden" id="error-email"></span>
+                    </div>
+
+                    {{-- Celular --}}
+                    <div>
+                        <label for="celular" class="block text-sm font-medium text-gray-700 mb-1">
+                            Celular
+                        </label>
+                        <input type="tel"
+                               id="celular"
+                               name="celular"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                               style="focus:ring-color: #2c4a6b;"
+                               placeholder="(opcional)">
+                    </div>
+
+                    {{-- Clientes --}}
+                    <div id="clientesContainer">
+                        <label for="clientes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Clientes <span class="text-red-500" id="clientesRequired">*</span>
+                        </label>
+                        <select name="clientes[]"
+                                id="clientes"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                                style="focus:ring-color: #2c4a6b; height: 120px;"
+                                multiple
+                                size="5">
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente->id }}" class="text-gray-900 py-1">
+                                    {{ $cliente->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-sm text-gray-500" id="clientesHelp">
+                            Mantén Ctrl (Cmd en Mac) para seleccionar múltiples clientes
+                        </p>
+                        <span class="text-red-500 text-xs hidden" id="error-clientes"></span>
+                    </div>
+                </div>
+
+                {{-- Fecha asignación (solo editar) --}}
+                <div id="fechaAsignacionContainer" class="hidden mt-4">
+                    <label for="fecha_asignacion" class="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha de asignación
+                    </label>
+                    <input type="date"
+                           id="fecha_asignacion"
+                           name="fecha_asignacion"
+                           class="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+                           style="focus:ring-color: #2c4a6b;">
+                </div>
+
+                {{-- Botones --}}
+                <div class="flex justify-end space-x-2 mt-6 pt-4 border-t border-gray-200">
+                    <button type="button"
+                            id="btnCancelar"
+                            class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors font-medium">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            id="btnGuardar"
+                            class="px-6 py-2 text-white rounded-md hover:opacity-90 transition-colors font-medium"
+                            style="background-color: #2c4a6b;">
+                        <span id="btnGuardarTexto">Guardar</span>
+                        <span id="btnGuardarLoading" class="hidden">
+                            <svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            Guardando...
+                        </span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    {{-- Modal de usuario (resto del código igual que ya lo tenías)… --}}
-    {{-- … --}}
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {{-- TABLA --}}
+    <div class="overflow-x-auto w-full">
+        <table class="min-w-full w-full border border-gray-200">
+            <thead style="background-color:#2c4a6b;">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
+                        Nombre
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
+                        Email
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
+                        Rol
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
+                        Clientes
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-blue-800">
+                        Obras
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
+                @forelse ($users as $user)
+                    <tr class="hover:bg-gray-50 transition-colors duration-150" data-user-id="{{ $user->id }}">
+                        <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 avatar-circle text-white font-medium text-sm"
+                                         style="background-color:#2c4a6b;">
+                                        {{ strtoupper(substr($user->name, 0, 2)) }}
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $user->name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                            <div class="text-sm text-gray-900">{{ $user->email }}</div>
+                        </td>
+
+                        {{-- Rol --}}
+                        <td class="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                            @php
+                                $roleName = $user->roles->first()->name ?? null;
+                                $roleKey  = $roleName ? strtolower($roleName) : null;
+                            @endphp
+
+                            @if($roleKey === 'superadmin')
+                                <span class="role-badge role-superadmin">Superadmin</span>
+                            @elseif($roleKey === 'admin')
+                                <span class="role-badge role-admin">Admin</span>
+                            @elseif($roleKey)
+                                <span class="role-badge role-user">{{ ucfirst($roleName) }}</span>
+                            @else
+                                <span class="role-badge role-none">Sin rol</span>
+                            @endif
+                        </td>
+
+                        {{-- Clientes --}}
+                        <td class="px-6 py-4 border-r border-gray-200">
+                            @if($user->clientes->isNotEmpty())
+                                <div class="text-sm text-gray-900 font-medium">
+                                    {{ $user->clientes->count() }}
+                                    {{ Str::plural('cliente', $user->clientes->count()) }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    {{ $user->clientes->pluck('name')->take(2)->implode(', ') }}
+                                    @if($user->clientes->count() > 2)
+                                        <span class="text-gray-400">+{{ $user->clientes->count() - 2 }} más</span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="text-xs text-gray-400 italic">Sin clientes</span>
+                            @endif
+                        </td>
+
+                        {{-- Obras --}}
+                        <td class="px-6 py-4 border-r border-gray-200">
+                            @if($user->obras->isNotEmpty())
+                                <div class="text-sm text-gray-900 font-medium">
+                                    {{ $user->obras->count() }}
+                                    {{ Str::plural('obra', $user->obras->count()) }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    {{ $user->obras->pluck('name')->take(2)->implode(', ') }}
+                                    @if($user->obras->count() > 2)
+                                        <span class="text-gray-400">+{{ $user->obras->count() - 2 }} más</span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="text-xs text-gray-400 italic">Sin obras</span>
+                            @endif
+                        </td>
+
+                        {{-- Acciones --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center space-x-3">
+                                <button class="btn-outline text-gray-600 hover:text-gray-900"
+                                        data-action="view"
+                                        data-user-id="{{ $user->id }}"
+                                        title="Ver detalles del usuario">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+
+                                @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
+                                    <button class="btn-outline text-gray-700 hover:text-blue-600 hover:border-blue-600"
+                                            data-action="edit"
+                                            data-user-id="{{ $user->id }}"
+                                            title="Editar usuario">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                    </button>
+
+                                    <button class="btn-danger"
+                                            data-action="delete"
+                                            data-user-id="{{ $user->id }}"
+                                            title="Eliminar usuario">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4-4h.01" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No hay usuarios registrados aún.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+    {{-- Select2 --}}
+  
+
 
 </x-app-layout>
 
 
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 console.log('🔍 Script cargando...');
 
