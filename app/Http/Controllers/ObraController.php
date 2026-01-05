@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Obra;
+use App\Models\Cliente; // 👈 si tu modelo se llama distinto, cámbialo
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ObraController extends Controller
@@ -19,8 +21,74 @@ class ObraController extends Controller
     }
 
     /**
+     * Mostrar formulario para crear una nueva obra (GET /works/create)
+     */
+public function create(Request $request)
+{
+    $user = $request->user();
+
+    // Clientes visibles para este usuario
+    $clientesQuery = Cliente::query();
+    if ($user) {
+        $clientesQuery = $clientesQuery->visibleFor($user);
+    }
+    $clientes = $clientesQuery->orderBy('name')->get();
+
+    // Estados válidos
+    $statuses = [
+        'planning',
+        'in_progress',
+        'paused',
+        'completed',
+    ];
+    $managers = User::role(['superadmin', 'admin', 'user'])
+    ->orderBy('name')
+    ->get();
+
+
+    // Cliente actual (si vienes desde un cliente específico, luego podemos llenarlo)
+    $cliente = null;
+
+    // 👇 Responsables posibles (ajusta el filtro según tus roles)
+    // Si usas Spatie:
+    // $managers = User::role(['superadmin', 'company_admin'])->orderBy('name')->get();
+    $managers = User::orderBy('name')->get();
+
+    return view('works.create', compact('clientes', 'statuses', 'cliente', 'managers'));
+}
+
+
+
+    /**
+     * Guardar una nueva obra en BD (POST /works)
+     */
+     public function store(Request $request)
+    {
+        // Ajusta estas reglas a los campos reales de tu tabla 'obras'
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'code'      => 'nullable|string|max:100',
+            'address'   => 'nullable|string|max:500',
+            'client_id' => 'required|exists:clientes,id',
+            'status'    => 'required|in:planning,in_progress,paused,completed',
+            'start_date'=> 'nullable|date',
+            'end_date'  => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        // Si tu tabla tiene manager_id y quieres que sea el usuario logueado:
+        if ($request->user()) {
+            $validated['manager_id'] = $request->user()->id;
+        }
+
+        $obra = Obra::create($validated);
+
+        return redirect()
+            ->route('works.show', $obra)
+            ->with('success', 'Obra creada correctamente.');
+    }
+
+    /**
      * Búsqueda / filtros (GET /works/search)
-     * Usa exactamente la misma lógica que index.
      */
     public function search(Request $request)
     {
@@ -56,19 +124,11 @@ class ObraController extends Controller
             $query->where('client_id', $clientId);
         }
 
-        // Si quieres limitar por clientes asignados al usuario, podrías hacer algo tipo:
-        // $clientesIds = $request->user()->getClientesIds();
-        // $query->whereIn('client_id', $clientesIds);
-
-        // Listado paginado (mantiene los filtros en la URL)
         $obras = $query
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->withQueryString();
 
-        // --- Estadísticas del header ---
-        // Aquí las hago globales; si quieres que respeten algún filtro,
-        // se puede ajustar fácil.
         $statsBase = Obra::query();
 
         $stats = [
@@ -77,7 +137,6 @@ class ObraController extends Controller
             'in_progress' => (clone $statsBase)->where('status', 'in_progress')->count(),
             'paused'      => (clone $statsBase)->where('status', 'paused')->count(),
             'completed'   => (clone $statsBase)->where('status', 'completed')->count(),
-            // si luego quieres mostrar 'cancelled', se puede agregar aquí
         ];
 
         return [$obras, $stats];
@@ -85,7 +144,6 @@ class ObraController extends Controller
 
     /**
      * Detalle de una obra (GET /works/{obra})
-     * (esto ya lo tienes, pero lo pongo por si acaso)
      */
     public function show(Obra $obra)
     {
