@@ -30,15 +30,6 @@ return new class extends Migration
             }
 
             // Índices para búsquedas (solo si no existen)
-<<<<<<< HEAD
-            if (!$this->hasIndex('cliente_user', 'cliente_user_status_index')) {
-                $table->index('status');
-            }
-
-            if (!$this->hasIndex('cliente_user', 'cliente_user_role_index')) {
-                $table->index('role');
-            }
-=======
             // if (!$this->hasIndex('cliente_user', 'cliente_user_status_index')) {
             //     $table->index('status');
             // }
@@ -46,7 +37,6 @@ return new class extends Migration
             // if (!$this->hasIndex('cliente_user', 'cliente_user_role_index')) {
             //     $table->index('role');
             // }
->>>>>>> 996809f7560aac3556b17de9baaefc485eba7561
         });
     }
 
@@ -57,31 +47,12 @@ return new class extends Migration
             if ($this->hasIndex('cliente_user', 'cliente_user_unique')) {
                 $table->dropUnique('cliente_user_unique');
             }
-<<<<<<< HEAD
-            if ($this->hasIndex('cliente_user', 'cliente_user_status_index')) {
-                $table->dropIndex('cliente_user_status_index');
-            }
-            if ($this->hasIndex('cliente_user', 'cliente_user_role_index')) {
-                $table->dropIndex('cliente_user_role_index');
-            }
-        });
-
-        // Eliminar columnas después de eliminar los índices
-        Schema::table('cliente_user', function (Blueprint $table) {
-            if (Schema::hasColumn('cliente_user', 'role')) {
-                $table->dropColumn('role');
-            }
-            if (Schema::hasColumn('cliente_user', 'status')) {
-                $table->dropColumn('status');
-            }
-=======
             // if ($this->hasIndex('cliente_user', 'cliente_user_status_index')) {
             //     $table->dropIndex(['status']);
             // }
             // if ($this->hasIndex('cliente_user', 'cliente_user_role_index')) {
             //     $table->dropIndex(['role']);
             // }
->>>>>>> 996809f7560aac3556b17de9baaefc485eba7561
         });
     }
     

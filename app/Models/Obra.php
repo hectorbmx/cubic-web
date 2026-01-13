@@ -32,6 +32,7 @@ class Obra extends Model
         'lng',
         'budget_amount',
         'currency',
+        'cover_image',
     ];
 
     /**

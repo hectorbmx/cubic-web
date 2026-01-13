@@ -62,7 +62,7 @@ class ObraController extends Controller
             'planos',
             'contratos',
             'fotos',
-            'informes'
+            'informes',
         ]);
 
         return response()->json([
@@ -156,15 +156,26 @@ class ObraController extends Controller
                         'progreso' => $informe->progress_pct ?? 0,
                     ];
                 }),
+                'personas' => $obra->personas->map(function ($persona){
+                    return[
+                        'id'     => $persona->id,
+                        'nombre' => $persona->nombre_completo,
+                        'rol'    => $persona->rol_empresa,
+                        'celular'=> $persona->celular,
+                        'email'  => $persona->email,
+
+                    ];
+                }),
             ]
         ]);
     }
  public function byCliente(Request $request, $clienteId)
     {
         $user = $request->user();
-
     
-        $isSuperAdmin = $user?->role === 'superadmin';
+        // $isSuperAdmin = $user?->role === 'superadmin';
+        $isSuperAdmin = $user && $user->hasRole('superadmin');
+
         $assignedClientIds = $user?->clientes()->pluck('clientes.id')->toArray() ?? [];
 
         if (!$isSuperAdmin && !in_array((int)$clienteId, $assignedClientIds, true)) {

@@ -28,6 +28,7 @@ class ObraDetalle extends Model
         'lng',
         'progress_pct',
         'event_date',
+        'cover_image',
     ];
 
     /**
@@ -135,4 +136,11 @@ class ObraDetalle extends Model
     {
         return $this->progress_pct ? $this->progress_pct . '%' : 'N/A';
     }
+    public function getCoverImageUrlAttribute()
+    {
+        return $this->cover_image
+            ? asset('storage/' . $this->cover_image)
+            : null;
+    }
+
 }

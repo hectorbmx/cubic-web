@@ -133,6 +133,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     // CRUD de usuarios
     Route::resource('users', UserManagementController::class);
+// Clientes de usuario (asignación rápida desde users.show)
+    Route::post('/users/{user}/clientes/asignar', [UserManagementController::class, 'asignarCliente'])
+        ->name('users.clientes.asignar');
+    Route::post('/users/{user}/password/reset', [UserManagementController::class, 'resetPassword'])
+        ->name('users.password.reset');
+
 
     // Obras de usuario
     Route::get('/usuarios/{user}/obras', [App\Http\Controllers\UserController::class, 'obras'])->name('usuarios.obras');

@@ -439,6 +439,30 @@
                         </p>
                         <span class="text-red-500 text-xs hidden" id="error-clientes"></span>
                     </div>
+                    <div>
+                       
+                     <div id="passwordResetWrapper" class="hidden">
+    <label for="password_reset" class="block text-sm font-medium text-gray-700 mb-1">
+        Resetear contraseña
+    </label>
+    <input type="password"
+           id="password_reset"
+           name="password_reset"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+           placeholder="Nueva contraseña (opcional)">
+
+    <label for="password_reset_confirmation"
+           class="block text-sm font-medium text-gray-700 mb-1 mt-3">
+        Confirmar contraseña
+    </label>
+    <input type="password"
+           id="password_reset_confirmation"
+           name="password_reset_confirmation"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 text-gray-900 bg-white"
+           placeholder="Confirmar contraseña">
+</div>
+
+                        </div>
                 </div>
 
                 {{-- Fecha asignación (solo editar) --}}
@@ -644,6 +668,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+     const usersBaseUrl = "{{ url('users') }}"; 
 console.log('🔍 Script cargando...');
 
 // Esperar a que el DOM esté listo
@@ -959,7 +984,9 @@ function initUsuariosScript() {
         showForm();
 
         $.ajax({
-            url: `/users/${userId}/edit`,
+            // url: `/users/${userId}/edit`,
+            url: `${usersBaseUrl}/${userId}/edit`,
+
             method: 'GET',
             success: function(response) {
                 console.log('✅ Datos del usuario cargados:', response);
@@ -971,7 +998,13 @@ function initUsuariosScript() {
                 $('#formMethod').val('PUT');
                 $('#formTitulo').text('Editar Usuario');
                 $('#btnGuardarTexto').text('Actualizar');
-                
+                $('#password_reset').val('');
+                $('#password_reset_confirmation').val('');
+                if (response.can_reset_password) {
+                    $('#passwordResetWrapper').removeClass('hidden');
+                    } else {
+                    $('#passwordResetWrapper').addClass('hidden');
+                    }
                 // Mostrar fecha de asignación si existe
                 if (response.user.created_at) {
                     $('#fecha_asignacion').val(response.user.created_at);
@@ -996,7 +1029,9 @@ function initUsuariosScript() {
         console.log('👁️ Ver detalles del usuario:', userId);
         
         // Redirigir a la página de detalles
-        window.location.href = `/users/${userId}`;
+        // window.location.href = `/users/${userId}`;
+        window.location.href = `${usersBaseUrl}/${userId}`;
+
     });
 
     // ============================================
@@ -1004,37 +1039,42 @@ function initUsuariosScript() {
     // ============================================
 
   $('#formUsuario').on('submit', function(e) {
+    // 1) SIEMPRE cancelamos el envío normal del formulario
+    e.preventDefault();
+      e.stopPropagation();
+  console.log('[FORM] submit interceptado');
+  
     const role = $('#role').val();
     const clientes = $('#clientes').val();
 
     // Solo validar para USER
     if (role === 'user' && (!clientes || clientes.length === 0)) {
-        e.preventDefault();
         alert('⚠️ Los usuarios con rol "user" deben tener al menos un cliente asignado.');
         $('#clientes').focus();
-        return false;
+        return; // <- ya no hace falta e.preventDefault() aquí
     }
 
     clearAllErrors();
 
-    // Obtener clientes seleccionados
     const clientesSeleccionados = $('#clientes').val() || [];
-    
+
     const formData = {
         name: $('#name').val().trim(),
         email: $('#email').val().trim(),
         role: $('#role').val(),
         phone: $('#celular').val().trim(),
-        clientes: clientesSeleccionados, // ← AGREGADO
+        clientes: clientesSeleccionados,
         _token: $('meta[name="csrf-token"]').attr('content')
     };
 
-    console.log('📋 Datos del formulario:', formData);
-    console.log('👥 Clientes seleccionados:', clientesSeleccionados);
-
     const method = $('#formMethod').val();
     const userId = $('#userId').val();
-    const url = method === 'PUT' ? `/users/${userId}` : '/users';
+
+    // RECOMENDADO: usar url() de Laravel para no pelear con /cubic/public
+    const usersBaseUrl = "{{ url('users') }}";
+    const url = method === 'PUT'
+        ? `${usersBaseUrl}/${userId}`
+        : usersBaseUrl;
 
     // Mostrar loading
     $('#btnGuardar').prop('disabled', true);
@@ -1048,10 +1088,12 @@ function initUsuariosScript() {
         success: function(response) {
             console.log('✅ Usuario guardado:', response);
             hideForm();
-            showAlert('success', response.message || (method === 'PUT' ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'));
-            
+            showAlert('success', response.message || (method === 'PUT'
+                ? 'Usuario actualizado exitosamente'
+                : 'Usuario creado exitosamente'));
+
             setTimeout(() => {
-                window.location.reload();
+                // window.location.reload();
             }, 1500);
         },
         error: function(xhr) {
@@ -1062,7 +1104,6 @@ function initUsuariosScript() {
 
             if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
-                console.log('📝 Errores de validación:', errors);
                 $.each(errors, function(field, messages) {
                     showFieldError(field, messages[0]);
                 });
@@ -1071,6 +1112,7 @@ function initUsuariosScript() {
             }
         }
     });
+    return false;
 });
     // ============================================
     // ELIMINAR USUARIO
@@ -1086,7 +1128,8 @@ function initUsuariosScript() {
             console.log('🗑️ Eliminando usuario:', userId);
             
             $.ajax({
-                url: `/users/${userId}`,
+                // url: `/users/${userId}`,
+                url: `${usersBaseUrl}/${userId}`,
                 method: 'POST',
                 data: {
                     _method: 'DELETE',
@@ -1101,7 +1144,7 @@ function initUsuariosScript() {
                         
                         if ($('#usersTableBody tr:visible').length === 0) {
                             setTimeout(() => {
-                                window.location.reload();
+                                // window.location.reload();
                             }, 1000);
                         }
                     });

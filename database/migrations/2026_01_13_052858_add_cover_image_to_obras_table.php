@@ -8,17 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('obras_detalles', function (Blueprint $table) {
-            // Ruta del archivo (storage/public...)
+        Schema::table('obras', function (Blueprint $table) {
             $table->string('cover_image', 255)
                   ->nullable()
-                  ->after('event_date');
+                  ->after('lng'); // ajusta si prefieres otra posición
         });
     }
 
     public function down(): void
     {
-        Schema::table('obras_detalles', function (Blueprint $table) {
+        Schema::table('obras', function (Blueprint $table) {
             $table->dropColumn('cover_image');
         });
     }
