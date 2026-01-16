@@ -610,6 +610,7 @@
                         {{-- Acciones --}}
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <div class="flex items-center justify-center space-x-3">
+                                       @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
                                 <button class="btn-outline text-gray-600 hover:text-gray-900"
                                         data-action="view"
                                         data-user-id="{{ $user->id }}"
@@ -622,8 +623,8 @@
                                     </svg>
                                 </button>
 
-                                @if(auth()->user()?->hasRole('superadmin') || auth()->user()?->hasRole('admin'))
-                                    <button class="btn-outline text-gray-700 hover:text-blue-600 hover:border-blue-600"
+                       
+                                    {{-- <button class="btn-outline text-gray-700 hover:text-blue-600 hover:border-blue-600"
                                             data-action="edit"
                                             data-user-id="{{ $user->id }}"
                                             title="Editar usuario">
@@ -631,7 +632,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
-                                    </button>
+                                    </button> --}}
 
                                     <button class="btn-danger"
                                             data-action="delete"
