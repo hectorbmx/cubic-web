@@ -100,7 +100,8 @@ class ObraController extends Controller
                     return [
                         'id' => $detalle->id,
                         'titulo' => $detalle->title ?? $detalle->nombre ?? '',
-                        'descripcion' => $detalle->description ?? $detalle->descripcion ?? '',
+                        'descripcion' => $detalle->body ?? $detalle->body ?? '',
+                        'progress' => $detalle->progress_pct ?? $detalle->progress_pct ?? '',
                         'fecha' => $detalle->created_at->format('Y-m-d H:i:s'),
                     ];
                 }),
