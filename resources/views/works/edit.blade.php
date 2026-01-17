@@ -40,24 +40,29 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
         {{-- Preview actual (si existe) --}}
-        <div class="md:col-span-1">
-            <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                @if(!empty($obra->cover_image))
-                    <img
-                        src="{{ asset('storage/'.$obra->cover_image) }}"
-                        alt="Foto de la obra"
-                        class="w-full h-44 object-cover"
-                    >
-                @else
-                    <div class="w-full h-44 flex items-center justify-center text-sm text-gray-500">
-                        Sin foto
-                    </div>
-                @endif
-            </div>
-            <p class="mt-2 text-xs text-gray-500">
-                Recomendado: JPG/PNG, máximo 5MB.
-            </p>
-        </div>
+<div class="md:col-span-1">
+  <div class="rounded-xl border border-gray-200 bg-white overflow-hidden"
+       style="height: 11rem; max-height: 11rem;">
+    @if(!empty($obra->cover_image))
+      <img
+  src="{{ asset('storage/'.$obra->cover_image) }}"
+  alt="Foto de la obra"
+  style="width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; background: #f3f4f6;"
+>
+
+    @else
+      <div class="w-full h-full flex items-center justify-center text-sm text-gray-500">
+        Sin foto
+      </div>
+    @endif
+  </div>
+
+  <p class="mt-2 text-xs text-gray-500">
+    Recomendado: JPG/PNG, máximo 5MB.
+  </p>
+</div>
+
+
 
         {{-- Input --}}
         <div class="md:col-span-2">

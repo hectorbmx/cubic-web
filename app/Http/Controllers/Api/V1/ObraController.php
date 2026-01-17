@@ -80,6 +80,7 @@ class ObraController extends Controller
                 'lng' => $obra->lng,
                 'presupuesto' => $obra->budget_amount,
                 'moneda' => $obra->currency,
+                'cover_image' => $obra->cover_image,
                 
                 // Cliente
                 'cliente' => [

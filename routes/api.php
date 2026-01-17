@@ -6,11 +6,18 @@ use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\ObraController;
 use App\Http\Requests\Api\V1\RegisterRequest;
 use App\Http\Controllers\Api\V1\UserProfileController;
+use App\Http\Controllers\Api\V1\AppPasswordResetController;
+
 
 
 // Versión 1 de la API
 Route::prefix('v1')->group(function () {
     
+
+
+    Route::post('password/forgot', [AppPasswordResetController::class, 'forgot']);
+    Route::post('password/reset',  [AppPasswordResetController::class, 'reset']);
+
     // Rutas públicas
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']); 
