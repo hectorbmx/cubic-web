@@ -91,7 +91,7 @@ public function login(Request $request)
 public function me(Request $request)
 {
     $user = $request->user();
-    $user->load('clientes', 'roles');
+    $user->load('clientes', 'roles','obras');
 
     $roles = $user->roles->pluck('name'); // Collection
 
@@ -115,6 +115,18 @@ public function me(Request $request)
                 'email' => $cliente->email,
             ];
         }),
+          'obras' => $user->obras->map(function ($obra) {
+            return [
+                'id' => $obra->id,
+                'client_id' => $obra->client_id,
+                'name' => $obra->name,
+                'code' => $obra->code,
+                'status' => $obra->status,
+                'role' => $obra->pivot->role ?? null, // viene de withPivot('role')
+            ];
+        })->values(),
+
+        'obra_ids' => $user->obras->pluck('id')->values(),
 
         // compatibilidad
         'client_id' => $user->clientes->first()->id ?? null,
