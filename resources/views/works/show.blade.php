@@ -1409,6 +1409,9 @@ function showNotification(type, message) {
 
     
 </div>
+<script>
+  const STORAGE_BASE = @json(asset('storage'));
+</script>
 
 <script>
     
@@ -1803,36 +1806,48 @@ $(document).ready(function() {
                     $('#fotos-empty').remove();
                     
                     // Agregar nuevas fotos a la galería
-                    response.fotos.forEach(function(foto) {
+                 response.fotos.forEach(function(foto) {
+
+  const src = `${STORAGE_BASE}/${foto.ruta_archivo}`;
+  const nombre = (foto.nombre_archivo ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
                         var fotoHtml = `
                             <div class="foto-card" id="foto-${foto.id}" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;">
-                                <div style="position: relative; padding-top: 75%; overflow: hidden; background: #f3f4f6;">
-                                    <img src="/storage/${foto.ruta_archivo}" 
-                                         alt="${foto.nombre_archivo}"
-                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
-                                         onclick="openImageModal('/storage/${foto.ruta_archivo}', '${foto.nombre_archivo}')">
+                            <div style="position: relative; padding-top: 75%; overflow: hidden; background: #f3f4f6;">
+                                <img
+                                src="${src}"
+                                alt="${nombre}"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+                                onclick="openImageModal('${src}', '${nombre}')"
+                                >
+                            </div>
+
+                            <div style="padding: 1rem;">
+                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 0.5rem;">
+                                ${new Date(foto.fecha_captura || foto.created_at).toLocaleDateString('es-MX')}
                                 </div>
-                                <div style="padding: 1rem;">
-                                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 0.5rem;">
-                                        ${new Date(foto.fecha_captura || foto.created_at).toLocaleDateString('es-MX')}
-                                    </div>
-                                    ${foto.descripcion ? `<div style="font-size: 13px; color: #374151; margin-bottom: 0.5rem;">${foto.descripcion}</div>` : ''}
-                                    <div style="font-size: 11px; color: #9ca3af;">
-                                        Por ${foto.uploaded_by.name}
-                                    </div>
-                                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-                                        <a href="/storage/${foto.ruta_archivo}" download="${foto.nombre_archivo}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
-                                            💾
-                                        </a>
-                                        <button type="button" onclick="deleteFoto(${foto.id})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
-                                            🗑️
-                                        </button>
-                                    </div>
+
+                                ${foto.descripcion ? `<div style="font-size: 13px; color: #374151; margin-bottom: 0.5rem;">${foto.descripcion}</div>` : ''}
+
+                                <div style="font-size: 11px; color: #9ca3af;">
+                                Por ${foto.uploaded_by?.name ?? ''}
+                                </div>
+
+                                <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                                <a href="${src}" download="${nombre}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
+                                    💾
+                                </a>
+                                <button type="button" onclick="deleteFoto(${foto.id})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                                    🗑️
+                                </button>
                                 </div>
                             </div>
+                            </div>
                         `;
+
                         $('#fotos-gallery').prepend(fotoHtml);
-                    });
+                        });
+
                     
                     // Reset form y cerrar
                     $('#form-foto')[0].reset();
