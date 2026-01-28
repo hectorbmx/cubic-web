@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\NewRegisterController;
 use App\Http\Controllers\ObraPersonaController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ObraInformeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,13 +99,13 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
         Route::delete('/obras/{obra}/personas/{persona}', [ObraPersonaController::class, 'destroy'])->name('obras.personas.destroy');
         
         // Fotos de obra
-        Route::prefix('obras/{obra}/fotos')->name('obras.fotos.')->group(function () {
+        Route::prefix('works/{obra}/fotos')->name('obras.fotos.')->group(function () {
             Route::post('/', [ObraFotoController::class, 'store'])->name('store');
             Route::delete('/{foto}', [ObraFotoController::class, 'destroy'])->name('destroy');
         });
         
         // Planos de obra
-        Route::prefix('obras/{obra}/planos')->name('obras.planos.')->group(function () {
+        Route::prefix('works/{obra}/planos')->name('obras.planos.')->group(function () {
             Route::get('/', [ObraPlanoController::class, 'index'])->name('index');
             Route::post('/', [ObraPlanoController::class, 'store'])->name('store');
             Route::get('/{plano}/download', [ObraPlanoController::class, 'download'])->name('download');
@@ -112,10 +113,17 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
         });
 
         // Contratos de obra
-        Route::prefix('obras/{obra}/contratos')->name('obras.contratos.')->group(function () {
+        Route::prefix('works/{obra}/contratos')->name('obras.contratos.')->group(function () {
             Route::post('/', [ObraContratoController::class, 'store'])->name('store');
             Route::get('/{contrato}/download', [ObraContratoController::class, 'download'])->name('download');
             Route::delete('/{contrato}', [ObraContratoController::class, 'destroy'])->name('destroy');
+        });
+
+         // Informes de obra
+        Route::prefix('works/{obra}/informes')->name('obras.informes.')->group(function () {
+            Route::post('/', [ObraInformeController::class, 'store'])->name('store');
+            Route::get('/{informe}/download', [ObraInformeController::class, 'download'])->name('download');
+            Route::delete('/{informe}', [ObraInformeController::class, 'destroy'])->name('destroy');
         });
     });
 });

@@ -558,7 +558,7 @@
                         <button class="tab-button" onclick="switchTab(event, 'planos')">📐 Planos</button>
                         <button class="tab-button" onclick="switchTab(event, 'contratos')">📄 Contratos</button>
                         <button class="tab-button" onclick="switchTab(event, 'informes')">📊 Informes</button>
-                        <button class="tab-button" onclick="switchTab(event, 'fotos')">📷 Fotos</button>
+                        <button class="tab-button" onclick="switchTab(event, 'fotos')">🧊 3D / Renders</button>
                         <button class="tab-button" onclick="switchTab(event, 'directorio')">📋 Directorio</button>
                     </div>
 
@@ -783,39 +783,6 @@
 
                     {{-- Tab: Planos --}}
     
-{{-- <div id="tab-planos" class="tab-content">
-    <div class="section-header">
-        <h2 class="section-title">Planos de la Obra</h2>
-        <button class="btn btn-primary" onclick="toggleForm('add-plano-form')">
-            ➕ Agregar Plano
-        </button>
-    </div> --}}
-
-    {{-- Formulario agregar plano --}}
-    {{-- <div id="add-plano-form" style="display: none; margin-bottom: 2rem;">
-        <form action="{{ route('obras.planos.store', $obra) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="info-card">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Archivo</label>
-                        <input type="file" name="archivo" class="form-input" required accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png">
-                        <small style="color: #6b7280; font-size: 12px;">PDF, DWG, DXF, JPG, PNG (Máx. 50MB)</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Descripción</label>
-                        <textarea name="descripcion" rows="3" class="form-textarea"></textarea>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 1rem;">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                    <button type="button" class="btn btn-secondary" onclick="toggleForm('add-plano-form')">Cancelar</button>
-                </div>
-            </div>
-        </form>
-    </div> --}}
     {{-- Tab: Planos --}}
 <div id="tab-planos" class="tab-content">
     <div class="section-header">
@@ -971,7 +938,7 @@ function deletePlano(planoId) {
     if(!confirm('¿Eliminar este plano?')) return;
     
     $.ajax({
-        url: '/obras/{{ $obra->id }}/planos/' + planoId,
+        url: '/works/{{ $obra->id }}/planos/' + planoId,
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'
@@ -1152,17 +1119,140 @@ function showNotification(type, message) {
     @endif
 </div>
 
-                    {{-- Tab: Informes --}}
-                    <div id="tab-informes" class="tab-content">
-                        <div class="section-header">
-                            <h2 class="section-title">Informes Semanales</h2>
-                        </div>
-                        <div class="empty-state">
-                            <div class="empty-icon">📊</div>
-                            <h3>Sección en desarrollo</h3>
-                            <p>Funcionalidad de informes próximamente</p>
-                        </div>
+                {{-- Tab: Informes --}}
+<div id="tab-informes" class="tab-content">
+    <div class="section-header">
+        <h2 class="section-title">Informes Semanales</h2>
+        <button class="btn btn-primary" onclick="toggleForm('add-informe-form')">
+            ➕ Agregar Informe
+        </button>
+    </div>
+
+    {{-- Formulario agregar informe --}}
+    <div id="add-informe-form" style="display: none; margin-bottom: 2rem;">
+        <form action="{{ route('obras.informes.store', $obra) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="info-card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Archivo</label>
+                        <input type="file" name="archivo" class="form-input" required accept=".pdf">
+                        <small style="color: #6b7280; font-size: 12px;">PDF (Máx. 50MB)</small>
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Semana</label>
+                        <input
+                            type="number"
+                            name="semana_numero"
+                            class="form-input"
+                            min="1"
+                            max="53"
+                            value="{{ old('semana_numero') }}"
+                            placeholder="Ej. 4"
+                            required
+                        >
+                        <small style="color: #6b7280; font-size: 12px;">Número de semana (1-53)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha inicio</label>
+                        <input type="date" name="fecha_inicio" class="form-input" value="{{ old('fecha_inicio') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha fin</label>
+                        <input type="date" name="fecha_fin" class="form-input" value="{{ old('fecha_fin') }}" required>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Título</label>
+                        <input
+                            type="text"
+                            name="titulo"
+                            class="form-input"
+                            value="{{ old('titulo') }}"
+                            maxlength="255"
+                            placeholder="Ej. Informe semanal - Avance de obra"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Resumen</label>
+                        <textarea
+                            name="resumen"
+                            rows="3"
+                            class="form-textarea"
+                            placeholder="Notas, avances, incidencias, acuerdos..."
+                        >{{ old('resumen') }}</textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleForm('add-informe-form')">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- Lista de informes --}}
+    @if($obra->informes->count() > 0)
+        @foreach($obra->informes as $informe)
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-title">
+                        📊 Semana {{ $informe->semana_numero }} — {{ $informe->titulo }}
+                    </div>
+
+                    <div class="list-item-meta">
+                        {{ $informe->fecha_inicio?->format('d/m/Y') }} →
+                        {{ $informe->fecha_fin?->format('d/m/Y') }}
+                        • Subido por {{ $informe->creador->name ?? 'N/D' }}
+                        • {{ $informe->created_at->format('d/m/Y H:i') }}
+                    </div>
+
+                    @if($informe->resumen)
+                        <div class="list-item-meta" style="margin-top: 0.25rem;">
+                            {{ $informe->resumen }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="list-item-actions">
+                    {{-- Descarga (preferido: route) --}}
+                    <a href="{{ route('obras.informes.download', [$obra, $informe]) }}" class="btn-icon" title="Descargar">
+                        💾
+                    </a>
+
+                    {{-- Alternativa (link directo al storage) si ya expones el archivo: --}}
+                    {{-- @if($informe->tiene_archivo)
+                        <a href="{{ $informe->archivo_url }}" class="btn-icon" title="Ver/Descargar" target="_blank" rel="noopener">
+                            🔗
+                        </a>
+                    @endif --}}
+
+                    <form action="{{ route('obras.informes.destroy', [$obra, $informe]) }}" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-icon" onclick="return confirm('¿Eliminar este informe?')" title="Eliminar">
+                            🗑️
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>No hay informes registrados</h3>
+            <p>Sube el informe semanal en PDF para documentar el avance de la obra</p>
+        </div>
+    @endif
+</div>
+{{-- termina el tab:informes --}}
 
                     {{-- Tab: Fotos --}}
 <div id="tab-fotos" class="tab-content">
@@ -1876,7 +1966,7 @@ function deleteFoto(fotoId) {
     if(!confirm('¿Eliminar esta foto?')) return;
     
     $.ajax({
-        url: '/obras/{{ $obra->id }}/fotos/' + fotoId,
+        url: '/works/{{ $obra->id }}/fotos/' + fotoId,
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'

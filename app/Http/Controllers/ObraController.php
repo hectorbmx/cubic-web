@@ -288,6 +288,7 @@ private function buildObrasAndStats(Request $request): array
             'contratos',
             'fotos',
             'informes',
+            'informes.creador',
         ]);
 
         return view('works.show', compact('obra'));

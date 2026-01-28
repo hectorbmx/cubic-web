@@ -48,7 +48,7 @@ class ObraContratoController extends Controller
 
 // Flujo normal del panel web:
 return redirect()
-    ->route('obras.show', $obra)   // o la ruta que uses para ver la obra
+    ->route('works.show', $obra)   // o la ruta que uses para ver la obra
     ->with('success', 'Contrato subido exitosamente');
         } catch (\Exception $e) {
             return response()->json([
@@ -57,32 +57,55 @@ return redirect()
             ], 500);
         }
     }
-
-    public function destroy(Obra $obra, ObraContrato $contrato)
-    {
-        try {
-            if ($contrato->obra_id !== $obra->id) {
+public function destroy(Obra $obra, ObraContrato $contrato)
+{
+    try {
+        if ((int) $contrato->obra_id !== (int) $obra->id) {
+            // Si es request AJAX/JSON, regresamos JSON; si no, redirect con error
+            if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Contrato no encontrado'
+                    'message' => 'Contrato no encontrado',
                 ], 404);
             }
 
-            $contrato->deleteFile();
-            $contrato->delete();
+            return redirect()
+                ->route('works.show', $obra->id)
+                ->with('error', 'Contrato no encontrado');
+        }
 
+        $contrato->deleteFile();
+        $contrato->delete();
+
+        if (request()->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Contrato eliminado exitosamente'
+                'message' => 'Contrato eliminado exitosamente',
+                'redirect' => route('works.show', $obra->id),
             ]);
+        }
 
-        } catch (\Exception $e) {
+        return redirect()
+            ->route('works.show', $obra->id)
+            ->with('success', 'Contrato eliminado exitosamente');
+
+    } catch (\Throwable $e) {
+
+        report($e);
+
+        if (request()->expectsJson()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar el contrato: ' . $e->getMessage()
+                'message' => 'Error al eliminar el contrato',
             ], 500);
         }
+
+        return redirect()
+            ->route('works.show', $obra->id)
+            ->with('error', 'Error al eliminar el contrato');
     }
+}
+
 
     public function download(Obra $obra, ObraContrato $contrato)
     {

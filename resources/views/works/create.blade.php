@@ -437,17 +437,56 @@
                                 </div>
 
                                 {{-- Moneda --}}
-                                <div class="form-group">
-                                    <label class="form-label">Moneda</label>
-                                    <select name="currency" class="form-select @error('currency') error @enderror">
-                                        <option value="MXN" {{ old('currency', 'MXN') == 'MXN' ? 'selected' : '' }}>MXN - Peso Mexicano</option>
-                                        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD - Dólar</option>
-                                        <option value="EUR" {{ old('currency') == 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
-                                    </select>
-                                    @error('currency')
-                                        <p class="error-message">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                
+                                        <div class="form-group">
+                                            <label class="form-label">Moneda</label>
+
+                                            <select name="currency" class="form-select @error('currency') error @enderror">
+                                                {{-- Default --}}
+                                                <option value="MXN" {{ old('currency', 'MXN') == 'MXN' ? 'selected' : '' }}>
+                                                    MXN - Peso Mexicano
+                                                </option>
+
+                                                {{-- América --}}
+                                                <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>
+                                                    USD - Dólar estadounidense
+                                                </option>
+                                                <option value="COP" {{ old('currency') == 'COP' ? 'selected' : '' }}>
+                                                    COP - Peso colombiano
+                                                </option>
+                                                <option value="CLP" {{ old('currency') == 'CLP' ? 'selected' : '' }}>
+                                                    CLP - Peso chileno
+                                                </option>
+                                                <option value="DOP" {{ old('currency') == 'DOP' ? 'selected' : '' }}>
+                                                    DOP - Peso dominicano
+                                                </option>
+                                                <option value="UYU" {{ old('currency') == 'UYU' ? 'selected' : '' }}>
+                                                    UYU - Peso uruguayo
+                                                </option>
+                                                <option value="PAB" {{ old('currency') == 'PAB' ? 'selected' : '' }}>
+                                                    PAB - Balboa panameño
+                                                </option>
+                                                <option value="BRL" {{ old('currency') == 'BRL' ? 'selected' : '' }}>
+                                                    BRL - Real brasileño
+                                                </option>
+                                                <option value="PEN" {{ old('currency') == 'PEN' ? 'selected' : '' }}>
+                                                    PEN - Sol peruano
+                                                </option>
+
+                                                {{-- Europa / África --}}
+                                                <option value="EUR" {{ old('currency') == 'EUR' ? 'selected' : '' }}>
+                                                    EUR - Euro
+                                                </option>
+                                                <option value="MAD" {{ old('currency') == 'MAD' ? 'selected' : '' }}>
+                                                    MAD - Dírham marroquí
+                                                </option>
+                                            </select>
+
+                                            @error('currency')
+                                                <p class="error-message">{{ $message }}</p>
+    @enderror
+</div>
+
                             </div>
                         </div>
 
