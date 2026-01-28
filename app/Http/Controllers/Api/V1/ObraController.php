@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Obra;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Storage;
+
 
 class ObraController extends Controller
 {
@@ -128,15 +130,27 @@ class ObraController extends Controller
                 }),
                 
                 // Contratos
-                'contratos' => $obra->contratos->map(function ($contrato) {
-                    return [
-                        'id' => $contrato->id,
-                        'nombre' => $contrato->name ?? $contrato->nombre ?? '',
-                        'url' => $contrato->file_path ?? $contrato->url ?? '',
-                        'fecha' => $contrato->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
+              'contratos' => $obra->contratos->map(function ($contrato) {
+                        // Aquí asumo que file_path guarda algo como "contratos/7/xxx.pdf"
+                        $path = $contrato->file_path ?: null;
+
+                        // Si en tu DB ya tienes una url absoluta en $contrato->url, la respetamos
+                        $absolute = $contrato->url && preg_match('/^https?:\/\//i', $contrato->url);
+
+                        return [
+                            'id' => $contrato->id,
+                            'nombre' => $contrato->name ?? $contrato->nombre ?? '',
+                            'file_path' => $path ?? '',
+
+                            // ✅ Siempre una URL lista para abrir
+                            'url' => $absolute
+                                ? $contrato->url
+                                : ($path ? url(Storage::disk('public')->url($path)) : ''),
+
+                            'fecha' => optional($contrato->created_at)->format('Y-m-d') ?? '',
+                        ];
+                    }),
+                                    
                 // Fotos
                 'fotos' => $obra->fotos->map(function ($foto) {
                      $baseUrl = config('app.url'); 
@@ -150,17 +164,22 @@ class ObraController extends Controller
                 }),
                 
                 // Informes
-                'informes' => $obra->informes->map(function ($informe) {
-                    return [
-                        'id' => $informe->id,
-                        'semana' => $informe->semana_numero ?? '',
-                        'fecha_inicio' => $informe->fecha_inicio?->format('Y-m-d') ?? '',
-                        'fecha_fin' => $informe->fecha_fin?->format('Y-m-d') ?? '',
-                        'titulo' => $informe->titulo ?? '',
-                        'resumen' => $informe->resumen ?? '',
-                        'archivo_path' => $informe->archivo_path ?? '',
-                    ];
-                }),
+               'informes' => $obra->informes->map(function ($informe) {
+                        $path = $informe->archivo_path ?: null;
+
+                        return [
+                            'id' => $informe->id,
+                            'semana' => $informe->semana_numero ?? '',
+                            'fecha_inicio' => $informe->fecha_inicio?->format('Y-m-d') ?? '',
+                            'fecha_fin' => $informe->fecha_fin?->format('Y-m-d') ?? '',
+                            'titulo' => $informe->titulo ?? '',
+                            'resumen' => $informe->resumen ?? '',
+                            'archivo_path' => $path ?? '',
+
+                            // ✅ URL pública absoluta (https://.../cubic/storage/...)
+                            'url' => $path ? url(Storage::disk('public')->url($path)) : '',
+                        ];
+                    }),
                 'personas' => $obra->personas->map(function ($persona){
                     return[
                         'id'     => $persona->id,
