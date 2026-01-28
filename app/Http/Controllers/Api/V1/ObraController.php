@@ -153,9 +153,12 @@ class ObraController extends Controller
                 'informes' => $obra->informes->map(function ($informe) {
                     return [
                         'id' => $informe->id,
-                        'titulo' => $informe->title ?? $informe->titulo ?? '',
-                        'fecha' => $informe->week_start ?? $informe->fecha ?? $informe->created_at->format('Y-m-d'),
-                        'progreso' => $informe->progress_pct ?? 0,
+                        'semana' => $informe->semana_numero ?? '',
+                        'fecha_inicio' => $informe->fecha_inicio?->format('Y-m-d') ?? '',
+                        'fecha_fin' => $informe->fecha_fin?->format('Y-m-d') ?? '',
+                        'titulo' => $informe->titulo ?? '',
+                        'resumen' => $informe->resumen ?? '',
+                        'archivo_path' => $informe->archivo_path ?? '',
                     ];
                 }),
                 'personas' => $obra->personas->map(function ($persona){
