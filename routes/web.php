@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\NewRegisterController;
 use App\Http\Controllers\ObraPersonaController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ObraInformeController;
+use App\Http\Controllers\PrivacyPolicyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ use App\Http\Controllers\ObraInformeController;
 
 // ========== RUTAS PÚBLICAS ==========
 Route::redirect('/', '/login');
+Route::get('/privacy', [PrivacyPolicyController::class, 'show'])->name('privacy');
 
 // Registro de nuevos usuarios
 Route::get('/new-register', [NewRegisterController::class, 'showForm'])->name('new-register');
