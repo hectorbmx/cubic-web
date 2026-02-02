@@ -17,7 +17,7 @@ class ObraDetalleController extends Controller
         $request->validate([
             'type' => 'required|in:note,progress,issue,delivery,inspection',
             'title' => 'required|string|max:255',
-            'body' => 'required|string',
+            // 'body' => 'required|string',
             'progress_pct' => 'nullable|integer|min:0|max:100',
         ]);
 
@@ -26,7 +26,7 @@ class ObraDetalleController extends Controller
             'created_by' => Auth::id(),
             'type' => $request->type,
             'title' => $request->title,
-            'body' => $request->body,
+            // 'body' => $request->body,
             'progress_pct' => $request->progress_pct ?? 0,
         ]);
 

@@ -453,6 +453,30 @@
             font-weight: 700;
             color: #2c4a6b;
         }
+        .form-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.form-help {
+    font-size: 0.875rem;
+    color: #6b7280; /* gris suave */
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-help {
+        margin-top: -0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
     </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <div class="obra-show-container">
@@ -626,41 +650,74 @@
 
                         {{-- Formulario para agregar detalle --}}
                         <div id="add-detalle-form" style="display: none; margin-bottom: 2rem;">
-                            <form action="{{ route('obras.detalles.store', $obra) }}" method="POST">
-                                @csrf
-                                <div class="info-card">
-                                    <div class="form-group">
-                                        <label class="form-label">Tipo de Detalle</label>
-                                        <select name="type" class="form-select" required>
-                                            <option value="note">Nota</option>
-                                            <option value="progress">Avance</option>
-                                            <option value="issue">Incidencia</option>
-                                            <option value="delivery">Entrega</option>
-                                            <option value="inspection">Inspección</option>
-                                        </select>
-                                    </div>
+                          <form action="{{ route('obras.detalles.store', $obra) }}" method="POST">
+    @csrf
 
-                                    <div class="form-group">
-                                        <label class="form-label">Título</label>
-                                        <input type="text" name="title" class="form-input" required>
-                                    </div>
+    <div class="info-card space-y-6">
 
-                                    <div class="form-group">
-                                        <label class="form-label">Descripción</label>
-                                        <textarea name="body" rows="3" class="form-textarea" required></textarea>
-                                    </div>
+        {{-- Tipo de Avance --}}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Tipo de Avance</label>
+                <select name="type" class="form-select" required>
+                    <option value="Earthworks">Earthworks</option>
+                    <option value="Foundations">Foundations</option>
+                    <option value="Roofing">Roofing</option>
+                    <option value="Enclosures">Enclosures / Façades</option>
+                    <option value="Installations">Installations</option>
+                    <option value="Finishes">Finishes</option>
+                    <option value="Testing">Testing and commissioning</option>
+                    <option value="Handover">Handover</option>
+                </select>
+            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Progreso (%)</label>
-                                        <input type="number" name="progress_pct" class="form-input" min="0" max="100" value="0">
-                                    </div>
+            <div class="form-help">
+                Selecciona la etapa de la obra a la que corresponde este avance.
+            </div>
+        </div>
 
-                                    <div style="display: flex; gap: 1rem;">
-                                        <button type="submit" class="btn btn-primary">Guardar</button>
-                                        <button type="button" class="btn btn-secondary" onclick="toggleForm('add-detalle-form')">Cancelar</button>
-                                    </div>
-                                </div>
-                            </form>
+        {{-- Título --}}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Título</label>
+                <input type="text" name="title" class="form-input" required>
+            </div>
+
+            <div class="form-help">
+                Describe brevemente el avance realizado (ej. “Excavación inicial”).
+            </div>
+        </div>
+
+        {{-- Progreso --}}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Progreso (%)</label>
+                <input
+                    type="number"
+                    name="progress_pct"
+                    class="form-input"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+            </div>
+
+            <div class="form-help">
+                Indica el porcentaje de avance estimado de la Obra en general despues de este avance.
+            </div>
+        </div>
+
+        {{-- Botones --}}
+        <div style="display:flex; gap:1rem;">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleForm('add-detalle-form')">
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</form>
+
                         </div>
 
                         {{-- Timeline de detalles --}}
