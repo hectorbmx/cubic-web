@@ -908,7 +908,7 @@
             <div class="empty-state" id="planos-empty">
                 <div class="empty-icon">📐</div>
                 <h3>No hay planos registrados</h3>
-                <p>Sube los planos y documentación técnica de la obra</p>
+                <p>Sube Solo el plano principal de la Obra en PDF</p>
             </div>
         @endif
     </div>
