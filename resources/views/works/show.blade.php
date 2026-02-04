@@ -577,7 +577,7 @@
                 <div class="tabs-container">
                     <div class="tabs-header">
                         <button class="tab-button active" onclick="switchTab(event, 'info')">📋 Información</button>
-                        <button class="tab-button" onclick="switchTab(event, 'detalles')">📝 Detalles/Historial</button>
+                        <button class="tab-button" onclick="switchTab(event, 'detalles')">📝 TimeLine</button>
                         <button class="tab-button" onclick="switchTab(event, 'camaras')">📹 Cámaras</button>
                         <button class="tab-button" onclick="switchTab(event, 'planos')">📐 Planos</button>
                         <button class="tab-button" onclick="switchTab(event, 'contratos')">📄 Contratos</button>
@@ -995,7 +995,8 @@ function deletePlano(planoId) {
     if(!confirm('¿Eliminar este plano?')) return;
     
     $.ajax({
-        url: '/works/{{ $obra->id }}/planos/' + planoId,
+        // url: '/works/{{ $obra->id }}/planos/' + planoId,
+        url: '/cubic/public/works/{{ $obra->id }}/planos/' + planoId,
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'
@@ -1314,7 +1315,7 @@ function showNotification(type, message) {
                     {{-- Tab: Fotos --}}
 <div id="tab-fotos" class="tab-content">
     <div class="section-header">
-        <h2 class="section-title">Fotos de la Obra</h2>
+        <h2 class="section-title">Renders de la Obra</h2>
         <button class="btn btn-primary" onclick="toggleForm('add-foto-form')">
             ➕ Agregar Fotos
         </button>
@@ -1899,37 +1900,48 @@ $(document).ready(function () {
 // AJAX para Fotos
 $(document).ready(function() {
     // Preview de fotos seleccionadas
-    $('#fotos-input').on('change', function(e) {
-        const files = e.target.files;
-        const previewContainer = $('#preview-container');
-        const fileCount = $('#file-count');
+    // $('#fotos-input').on('change', function(e) {
+    //     const files = e.target.files;
+    //     const previewContainer = $('#preview-container');
+    //     const fileCount = $('#file-count');
         
-        previewContainer.html('');
-        fileCount.text(files.length > 0 ? `${files.length} foto(s) seleccionada(s)` : '');
+    //     previewContainer.html('');
+    //     fileCount.text(files.length > 0 ? `${files.length} foto(s) seleccionada(s)` : '');
         
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = $('<img>').attr('src', e.target.result).css({
-                        'width': '100%',
-                        'height': '100px',
-                        'object-fit': 'cover',
-                        'border-radius': '8px',
-                        'border': '2px solid #e5e7eb'
-                    });
-                    previewContainer.append(img);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    });
+    //     Array.from(files).forEach(file => {
+    //         if (file.type.startsWith('image/')) {
+    //             const reader = new FileReader();
+    //             reader.onload = function(e) {
+    //                 const img = $('<img>').attr('src', e.target.result).css({
+    //                     'width': '100%',
+    //                     'height': '100px',
+    //                     'object-fit': 'cover',
+    //                     'border-radius': '8px',
+    //                     'border': '2px solid #e5e7eb'
+    //                 });
+    //                 previewContainer.append(img);
+    //             }
+    //             reader.readAsDataURL(file);
+    //         }
+    //     });
+    // });
 
     // Submit fotos
     $('#form-foto').on('submit', function(e) {
         e.preventDefault();
+
+         if (selectedFiles.length === 0) {
+                alert('Selecciona al menos una foto');
+                return;
+            }
+
         
         var formData = new FormData(this);
+
+        //   selectedFiles.forEach(file => {
+        //         formData.append('fotos[]', file);
+        //     });
+
         var $btn = $(this).find('button[type="submit"]');
         var $btnText = $btn.find('.btn-text');
         var $btnSpinner = $btn.find('.btn-spinner');
@@ -2024,6 +2036,8 @@ function deleteFoto(fotoId) {
     
     $.ajax({
         url: '/works/{{ $obra->id }}/fotos/' + fotoId,
+        // url: '/cubic/public/works/{{ $obra->id }}/fotos/' + fotoId,
+
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'
@@ -2112,8 +2126,64 @@ $(document).on('mouseenter', '.foto-card', function() {
             const form = document.getElementById(formId);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
-    </script>
-    
-   
+   //Borrar imagenes seleccionadas antes de subirlas a guardar
+let selectedFiles = [];
+
+const input = document.getElementById('fotos-input');
+const preview = document.getElementById('preview-container');
+const fileCount = document.getElementById('file-count');
+
+input.addEventListener('change', function () {
+  selectedFiles = Array.from(input.files);
+  renderPreviews();
+});
+
+function renderPreviews() {
+  preview.innerHTML = '';
+  fileCount.textContent = `${selectedFiles.length} foto(s) seleccionada(s)`;
+
+  selectedFiles.forEach((file, index) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const div = document.createElement('div');
+      div.style.position = 'relative';
+
+      div.innerHTML = `
+        <img src="${e.target.result}" style="
+          width:100%;
+          height:100px;
+          object-fit:cover;
+          border-radius:8px;
+        ">
+        <button type="button"
+          onclick="removeFile(${index})"
+          style="
+            position:absolute;
+            top:4px;
+            right:4px;
+            background:#ef4444;
+            color:white;
+            border:none;
+            border-radius:50%;
+            width:22px;
+            height:22px;
+            cursor:pointer;
+          ">✕</button>
+      `;
+
+      preview.appendChild(div);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeFile(index) {
+  selectedFiles.splice(index, 1);
+  renderPreviews();
+}
+</script>
+
 
 </x-app-layout>
