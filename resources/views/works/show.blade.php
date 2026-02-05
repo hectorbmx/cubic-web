@@ -459,7 +459,19 @@
     gap: 1.5rem;
     align-items: center;
 }
+.btn-delete-detalle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px 8px;
+    transition: color 0.2s;
+    font-size: 16px;
+}
 
+.btn-delete-detalle:hover {
+    color: #ef4444;
+}
 .form-help {
     font-size: 0.875rem;
     color: #6b7280; /* gris suave */
@@ -660,14 +672,14 @@
             <div class="form-group">
                 <label class="form-label">Tipo de Avance</label>
                 <select name="type" class="form-select" required>
-                    <option value="Earthworks">Earthworks</option>
-                    <option value="Foundations">Foundations</option>
-                    <option value="Roofing">Roofing</option>
-                    <option value="Enclosures">Enclosures / Façades</option>
-                    <option value="Installations">Installations</option>
-                    <option value="Finishes">Finishes</option>
-                    <option value="Testing">Testing and commissioning</option>
-                    <option value="Handover">Handover</option>
+                    <option value="Earthworks">1.Earthworks</option>
+                    <option value="Foundations">2.Foundations</option>
+                    <option value="Roofing">3.Roofing</option>
+                    <option value="Enclosures">4.Enclosures / Façades</option>
+                    <option value="Installations">5.Installations</option>
+                    <option value="Finishes">6.Finishes</option>
+                    <option value="Testing">7.Testing and commissioning</option>
+                    <option value="Handover">8.Handover</option>
                 </select>
             </div>
 
@@ -726,20 +738,29 @@
                                 @foreach($obra->detalles->sortByDesc('created_at') as $detalle)
                                     <div class="timeline-item">
                                         <div class="timeline-date">{{ $detalle->created_at->format('d/m/Y H:i') }}</div>
-                                        <div class="timeline-title">
-                                            {{ $detalle->title }}
-                                            <span class="badge badge-planning">{{ ucfirst($detalle->type) }}</span>
-                                        </div>
+                                       <div class="timeline-title">
+                                        {{ $detalle->title }}
+                                        <span class="badge badge-planning">{{ ucfirst($detalle->type) }}</span>
+                                        <form action="{{ route('obras.detalles.destroy', [$obra, $detalle]) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este detalle?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete-detalle" title="Eliminar detalle">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
                                         <div class="timeline-content">{{ $detalle->body }}</div>
                                         @if($detalle->progress_pct)
                                             <div class="timeline-content" style="margin-top: 0.5rem;">
                                                 <strong>Progreso:</strong> {{ $detalle->progress_pct }}%
+                                                
                                             </div>
                                         @endif
                                         @if($detalle->creador)
-                                            <div class="timeline-content" style="margin-top: 0.25rem; font-size: 12px; color: #9ca3af;">
-                                                Por: {{ $detalle->creador->name }}
-                                            </div>
+                                             <div class="timeline-content" style="margin-top: 0.25rem; font-size: 12px; color: #9ca3af; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Por: {{ $detalle->creador->name }}</span>
+                    </div>
+                                              
                                         @endif
                                     </div>
                                 @endforeach
