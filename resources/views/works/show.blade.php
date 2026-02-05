@@ -796,7 +796,7 @@
 
                                         <div class="form-group">
                                             <label class="form-label">URL de Acceso</label>
-                                            <input type="url" name="url" class="form-input" placeholder="https://..." required>
+                                            <input type="text" name="url" class="form-input" placeholder="https://..." required>
                                         </div>
 
                                         <div class="form-group">
