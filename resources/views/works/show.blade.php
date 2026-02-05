@@ -663,30 +663,30 @@
                         {{-- Formulario para agregar detalle --}}
                         <div id="add-detalle-form" style="display: none; margin-bottom: 2rem;">
                           <form action="{{ route('obras.detalles.store', $obra) }}" method="POST">
-    @csrf
+                                @csrf
 
-    <div class="info-card space-y-6">
+                                <div class="info-card space-y-6">
 
-        {{-- Tipo de Avance --}}
-        <div class="form-row">
-            <div class="form-group">
-                <label class="form-label">Tipo de Avance</label>
-                <select name="type" class="form-select" required>
-                    <option value="Earthworks">1.Earthworks</option>
-                    <option value="Foundations">2.Foundations</option>
-                    <option value="Roofing">3.Roofing</option>
-                    <option value="Enclosures">4.Enclosures / Façades</option>
-                    <option value="Installations">5.Installations</option>
-                    <option value="Finishes">6.Finishes</option>
-                    <option value="Testing">7.Testing and commissioning</option>
-                    <option value="Handover">8.Handover</option>
-                </select>
-            </div>
+                                    {{-- Tipo de Avance --}}
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Tipo de Avance</label>
+                                            <select name="type" class="form-select" required>
+                                                <option value="Earthworks">1.Earthworks</option>
+                                                <option value="Foundations">2.Foundations</option>
+                                                <option value="Roofing">3.Roofing</option>
+                                                <option value="Enclosures">4.Enclosures / Façades</option>
+                                                <option value="Installations">5.Installations</option>
+                                                <option value="Finishes">6.Finishes</option>
+                                                <option value="Testing">7.Testing and commissioning</option>
+                                                <option value="Handover">8.Handover</option>
+                                            </select>
+                                        </div>
 
-            <div class="form-help">
-                Selecciona la etapa de la obra a la que corresponde este avance.
-            </div>
-        </div>
+                                        <div class="form-help">
+                                            Selecciona la etapa de la obra a la que corresponde este avance.
+                                        </div>
+                                    </div>
 
         {{-- Título --}}
         <div class="form-row">
