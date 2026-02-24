@@ -132,18 +132,31 @@ class ObraController extends Controller
                 //         'fecha' => $plano->created_at->format('Y-m-d'),
                 //     ];
                 // }),
-                'planos' => $obra->planos->map(function ($plano) {
-                        // 1. Definimos la ruta del archivo (ajusta 'file_path' al nombre real de tu columna)
-                        $path = $plano->file_path ?? $plano->archivo_path ?? null;
+             'planos' => $obra->planos->map(function ($plano) {
+    // 1. Obtenemos el path relativo (ej: "planos/10/archivo.pdf")
+    // Usamos el campo que contenga solo el nombre/ruta del archivo, NO la url completa.
+    $path = $plano->file_path ?? $plano->archivo_path ?? $plano->url ?? null;
 
-                        return [
-                            'id'     => $plano->id,
-                            'nombre' => $plano->name ?? $plano->nombre ?? '',
-                            // 2. Usamos la misma lógica de informes para la URL
-                            'url'    => $path ? url(Storage::disk('public')->url($path)) : '',
-                            'fecha'  => $plano->created_at ? $plano->created_at->format('Y-m-d') : '',
-                        ];
-                    }),
+    // Limpiamos el path por si acaso viene con la URL completa de la base de datos
+    // Esto evita que se concatene doble si en la BD ya decía "https://..."
+    if (str_contains($path, 'http')) {
+        $path = str_replace(url(Storage::disk('public')->url('')), '', $path);
+        $path = ltrim($path, '/');
+    }
+
+    return [
+        'id'     => $plano->id,
+        'nombre' => $plano->name ?? $plano->nombre ?? '',
+        
+        // OPCIÓN A: Si quieres que Laravel lo maneje (Recomendado)
+        'url'    => $path ? asset('storage/' . $path) : '',
+        
+        // OPCIÓN B: Si necesitas FORZAR el "/public/" como pediste al inicio:
+        // 'url' => $path ? "https://www.bmxmexico.com/cubic/public/storage/" . $path : '',
+
+        'fecha'  => $plano->created_at ? $plano->created_at->format('Y-m-d') : '',
+    ];
+}),
                                     
                 // Contratos
               'contratos' => $obra->contratos->map(function ($contrato) {
