@@ -7,6 +7,7 @@ use App\Models\Obra;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class ObraController extends Controller
@@ -115,19 +116,41 @@ class ObraController extends Controller
                         'id' => $camara->id,
                         'nombre' => $camara->name ?? $camara->nombre ?? '',
                         'url' => $camara->url ?? $camara->stream_url ?? '',
+                        
                         'activa' => $camara->is_active ?? true,
                     ];
                 }),
                 
                 // Planos
+                // 'planos' => $obra->planos->map(function ($plano) {
+                //     return [
+                //         'id' => $plano->id,
+                //         'nombre' => $plano->name ?? $plano->nombre ?? '',
+                //         'url' => $plano->file_path ?? $plano->url ?? '',
+                //         'url' => $plano ? url(Storage::disk('public')->url($file_path)) : '',
+
+                //         'fecha' => $plano->created_at->format('Y-m-d'),
+                //     ];
+                // }),
                 'planos' => $obra->planos->map(function ($plano) {
-                    return [
-                        'id' => $plano->id,
-                        'nombre' => $plano->name ?? $plano->nombre ?? '',
-                        'url' => $plano->file_path ?? $plano->url ?? '',
-                        'fecha' => $plano->created_at->format('Y-m-d'),
-                    ];
-                }),
+    // aquí debes tomar el "path relativo" en storage/app/public
+    // Ej: 'planos/10/1124-...pdf'
+                        $path = $plano->archivo_path
+                            ?? $plano->file_path
+                            ?? null;
+
+                        $prefix = rtrim(env('PUBLIC_PREFIX', '/cubic/public'), '/'); // en test
+
+                        return [
+                            'id' => $plano->id,
+                            'nombre' => $plano->name ?? $plano->nombre ?? '',
+                            'archivo_path' => $path ?? '',
+                            'url' => $path
+                                ? rtrim(config('app.url'), '/') . $prefix . Storage::disk('public')->url($path)
+                                : '',
+                            'fecha' => $plano->created_at?->format('Y-m-d') ?? '',
+                        ];
+                    }),
                 
                 // Contratos
               'contratos' => $obra->contratos->map(function ($contrato) {
