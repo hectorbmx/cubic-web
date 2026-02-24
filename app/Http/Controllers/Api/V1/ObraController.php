@@ -133,25 +133,18 @@ class ObraController extends Controller
                 //     ];
                 // }),
                 'planos' => $obra->planos->map(function ($plano) {
-    // aquí debes tomar el "path relativo" en storage/app/public
-    // Ej: 'planos/10/1124-...pdf'
-                        $path = $plano->archivo_path
-                            ?? $plano->file_path
-                            ?? null;
-
-                        $prefix = rtrim(env('PUBLIC_PREFIX', '/cubic/public'), '/'); // en test
+                        // 1. Definimos la ruta del archivo (ajusta 'file_path' al nombre real de tu columna)
+                        $path = $plano->file_path ?? $plano->archivo_path ?? null;
 
                         return [
-                            'id' => $plano->id,
+                            'id'     => $plano->id,
                             'nombre' => $plano->name ?? $plano->nombre ?? '',
-                            'archivo_path' => $path ?? '',
-                            'url' => $path
-                                ? rtrim(config('app.url'), '/') . $prefix . Storage::disk('public')->url($path)
-                                : '',
-                            'fecha' => $plano->created_at?->format('Y-m-d') ?? '',
+                            // 2. Usamos la misma lógica de informes para la URL
+                            'url'    => $path ? url(Storage::disk('public')->url($path)) : '',
+                            'fecha'  => $plano->created_at ? $plano->created_at->format('Y-m-d') : '',
                         ];
                     }),
-                
+                                    
                 // Contratos
               'contratos' => $obra->contratos->map(function ($contrato) {
                         // Aquí asumo que file_path guarda algo como "contratos/7/xxx.pdf"
