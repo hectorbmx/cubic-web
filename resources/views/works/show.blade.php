@@ -1405,9 +1405,17 @@ function showNotification(type, message) {
                             <a href="{{ asset('storage/' . $foto->ruta_archivo) }}" download="{{ $foto->nombre_archivo }}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
                                 💾
                             </a>
-                            <button type="button" onclick="deleteFoto({{ $foto->id }})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                            {{-- <button type="button" onclick="deleteFoto({{ $foto->id }})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
                                 🗑️
+                            </button> --}}
+                            <button type="button"
+                            onclick="deleteFoto({{ $foto->id }}, '{{ route('obras.fotos.destroy', [$obra->id, $foto->id]) }}')"
+                            class="btn-icon"
+                            title="Eliminar"
+                            style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                            🗑️
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -2052,16 +2060,18 @@ $(document).ready(function() {
     });
 });
 
-function deleteFoto(fotoId) {
+function deleteFoto(fotoId,url) {
     if(!confirm('¿Eliminar esta foto?')) return;
     
     $.ajax({
-        url: '/works/{{ $obra->id }}/fotos/' + fotoId,
+        url:url,
+        // url: '/works/{{ $obra->id }}/fotos/' + fotoId,
         // url: '/cubic/public/works/{{ $obra->id }}/fotos/' + fotoId,
 
-        type: 'DELETE',
+        type: 'POST',
         data: {
-            _token: '{{ csrf_token() }}'
+            _token: '{{ csrf_token() }}',
+            _method: 'DELETE'
         },
         success: function(response) {
             if(response.success) {
