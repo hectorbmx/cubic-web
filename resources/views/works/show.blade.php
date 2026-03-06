@@ -859,7 +859,6 @@
                         @endif
                     </div>
 
-                    {{-- Tab: Planos --}}
     
     {{-- Tab: Planos --}}
 <div id="tab-planos" class="tab-content">
@@ -919,9 +918,16 @@
                         <a href="{{ route('obras.planos.download', [$obra, $plano]) }}" class="btn-icon" title="Descargar">
                             💾
                         </a>
-                        <button type="button" class="btn-icon" onclick="deletePlano({{ $plano->id }})" title="Eliminar">
+                        {{-- <button type="button" class="btn-icon" onclick="deletePlano({{ $plano->id }})" title="Eliminar">
                             🗑️
-                        </button>
+                        </button> --}}
+
+               <button type="button"
+                        class="btn-icon"
+                        onclick="deletePlano('{{ route('obras.planos.destroy', [$obra->id, $plano->id]) }}', {{ $plano->id }})"
+                        title="Eliminar">
+                    🗑️
+                </button>
                     </div>
                 </div>
             @endforeach
@@ -1012,24 +1018,25 @@ $(document).ready(function() {
     });
 });
 
-function deletePlano(planoId) {
-    if(!confirm('¿Eliminar este plano?')) return;
-    
+function deletePlano(url, planoId) {
+    if (!confirm('¿Eliminar este plano?')) return;
+
     $.ajax({
-        // url: '/works/{{ $obra->id }}/planos/' + planoId,
-        url: '/cubic/public/works/{{ $obra->id }}/planos/' + planoId,
+        url: url,
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'
+            
         },
+        
         success: function(response) {
-            if(response.success) {
+            if (response.success) {
                 showNotification('success', response.message);
+
                 $('#plano-' + planoId).fadeOut(300, function() {
                     $(this).remove();
-                    
-                    // Si no hay más planos, mostrar empty state
-                    if($('#planos-list .list-item').length === 0) {
+
+                    if ($('#planos-list .list-item').length === 0) {
                         $('#planos-list').html(`
                             <div class="empty-state" id="planos-empty">
                                 <div class="empty-icon">📐</div>
@@ -1043,9 +1050,11 @@ function deletePlano(planoId) {
         },
         error: function(xhr) {
             var errorMsg = 'Error al eliminar el plano';
-            if(xhr.responseJSON && xhr.responseJSON.message) {
+
+            if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
             }
+
             showNotification('error', errorMsg);
         }
     });

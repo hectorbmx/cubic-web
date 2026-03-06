@@ -334,7 +334,6 @@
                     </div>
                 @endif
 
-                {{-- Header --}}
              {{-- Header --}}
 <div class="page-header">
     <div class="header-top">

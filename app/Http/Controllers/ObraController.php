@@ -293,4 +293,17 @@ private function buildObrasAndStats(Request $request): array
 
         return view('works.show', compact('obra'));
     }
+
+public function destroy(Obra $obra)
+{
+    // 1. (Opcional) Eliminar archivos asociados
+    // Si tu obra tiene una imagen en el storage, deberías borrarla aquí.
+
+    // 2. Ejecutar la eliminación en la BD
+    $obra->delete();
+
+    // 3. Redireccionar al usuario con un mensaje de éxito
+    return redirect()->route('works.index')
+                     ->with('success', 'La obra ha sido eliminada correctamente.');
+}
 }
