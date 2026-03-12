@@ -2037,9 +2037,13 @@ $(document).ready(function() {
                                 <a href="${src}" download="${nombre}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
                                     💾
                                 </a>
-                                <button type="button" onclick="deleteFoto(${foto.id})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
-                                    🗑️
-                                </button>
+                                <button type="button"
+                                        onclick="deleteFoto(${foto.id}, '/works/${obraId}/fotos/${foto.id}')"
+                                        class="btn-icon"
+                                        title="Eliminar"
+                                        style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                                        🗑️
+                                    </button>
                                 </div>
                             </div>
                             </div>
