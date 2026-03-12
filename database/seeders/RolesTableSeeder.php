@@ -3,15 +3,12 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Spatie\Permission\Models\Role;
 
 class RolesTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $now = Carbon::now();
-
         $roles = [
             ['name' => 'superadmin', 'guard_name' => 'web'],
             ['name' => 'admin',      'guard_name' => 'web'],
@@ -19,11 +16,9 @@ class RolesTableSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            DB::table('roles')->insert([
-                'name'       => $role['name'],
+            Role::firstOrCreate([
+                'name' => $role['name'],
                 'guard_name' => $role['guard_name'],
-                'created_at' => $now,
-                'updated_at' => $now,
             ]);
         }
     }

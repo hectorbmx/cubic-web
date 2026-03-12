@@ -987,7 +987,10 @@ $(document).ready(function() {
                                 <a href="/obras/${response.plano.obra_id}/planos/${response.plano.id}/download" class="btn-icon" title="Descargar">
                                     💾
                                 </a>
-                                <button type="button" class="btn-icon" onclick="deletePlano(${response.plano.id})" title="Eliminar">
+                                <button type="button"
+                            class="btn-icon"
+                            onclick="deletePlano('/works/${response.plano.obra_id}/planos/${response.plano.id}', ${response.plano.id})"
+                            title="Eliminar"> 
                                     🗑️
                                 </button>
                             </div>
