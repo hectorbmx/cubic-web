@@ -334,7 +334,6 @@
                     </div>
                 @endif
 
-                {{-- Header --}}
              {{-- Header --}}
 <div class="page-header">
     <div class="header-top">
@@ -356,13 +355,14 @@
     
     {{-- Estadísticas --}}
     <div class="stats-grid">
-       @php
-            $totalObras = $stats['total'];
-            $enPlanificacion = $stats['planning'];
-            $enProgreso = $stats['in_progress'];
-            $pausadas = $stats['paused'];
-            $completadas = $stats['completed'];
+      @php
+            $totalObras      = $stats['total']       ?? 0;
+            $enPlanificacion = $stats['planning']    ?? 0;
+            $enProgreso      = $stats['in_progress'] ?? 0;
+            $pausadas        = $stats['paused']      ?? 0;
+            $completadas     = $stats['completed']   ?? 0;
         @endphp
+
         
         <div class="stat-card">
             <div class="stat-icon">📊</div>
@@ -546,18 +546,25 @@
                         <div class="pagination-container">
                             {{ $obras->links() }}
                         </div>
-                    @else
-                    @if(auth()->user()->hasRole(['admin', 'superadmin']))
-                        <div class="empty-state">
-                            <div class="empty-icon">🏗️</div>
-                            <h3 style="font-size: 20px; color: #374151; margin-bottom: 0.5rem;">No hay obras registradas</h3>
-                            <p style="margin-bottom: 2rem;">Comienza creando tu primera obra</p>
-                            <a href="{{ route('works.create') }}" class="btn btn-primary">
-                                ➕ Crear Primera Obra
-                            </a>
-                        </div>
-                        @endif
-                    @endif
+                   @else
+    @if(auth()->user()->hasAnyRole(['admin', 'superadmin']))
+        <div class="empty-state">
+            <div class="empty-icon">🏗️</div>
+            <h3 style="font-size: 20px; color: #374151; margin-bottom: 0.5rem;">No hay obras registradas</h3>
+            <p style="margin-bottom: 2rem;">Comienza creando tu primera obra</p>
+            <a href="{{ route('works.create') }}" class="btn btn-primary">
+                ➕ Crear Primera Obra
+            </a>
+        </div>
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3 style="font-size: 20px; color: #374151; margin-bottom: 0.5rem;">Sin obras asignadas</h3>
+            <p style="margin-bottom: 0;">Este usuario no tiene obras asignadas.</p>
+        </div>
+    @endif
+@endif
+
                 </div>
             </div>
         </div>

@@ -16,7 +16,7 @@ class SuperAdminSeeder extends Seeder
 
         // Crear o actualizar el usuario SuperAdmin
         $user = DB::table('users')->updateOrInsert(
-            ['email' => 'hecrtorbmx@gmail.com'],
+            ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Super Admin',
                 'email_verified_at' => now(),

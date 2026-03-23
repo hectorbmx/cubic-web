@@ -453,6 +453,42 @@
             font-weight: 700;
             color: #2c4a6b;
         }
+        .form-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.5rem;
+    align-items: center;
+}
+.btn-delete-detalle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px 8px;
+    transition: color 0.2s;
+    font-size: 16px;
+}
+
+.btn-delete-detalle:hover {
+    color: #ef4444;
+}
+.form-help {
+    font-size: 0.875rem;
+    color: #6b7280; /* gris suave */
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-help {
+        margin-top: -0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
     </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <div class="obra-show-container">
@@ -553,12 +589,12 @@
                 <div class="tabs-container">
                     <div class="tabs-header">
                         <button class="tab-button active" onclick="switchTab(event, 'info')">📋 Información</button>
-                        <button class="tab-button" onclick="switchTab(event, 'detalles')">📝 Detalles/Historial</button>
+                        <button class="tab-button" onclick="switchTab(event, 'detalles')">📝 TimeLine</button>
                         <button class="tab-button" onclick="switchTab(event, 'camaras')">📹 Cámaras</button>
                         <button class="tab-button" onclick="switchTab(event, 'planos')">📐 Planos</button>
                         <button class="tab-button" onclick="switchTab(event, 'contratos')">📄 Contratos</button>
                         <button class="tab-button" onclick="switchTab(event, 'informes')">📊 Informes</button>
-                        <button class="tab-button" onclick="switchTab(event, 'fotos')">📷 Fotos</button>
+                        <button class="tab-button" onclick="switchTab(event, 'fotos')">🧊 3D / Renders</button>
                         <button class="tab-button" onclick="switchTab(event, 'directorio')">📋 Directorio</button>
                     </div>
 
@@ -626,41 +662,74 @@
 
                         {{-- Formulario para agregar detalle --}}
                         <div id="add-detalle-form" style="display: none; margin-bottom: 2rem;">
-                            <form action="{{ route('obras.detalles.store', $obra) }}" method="POST">
+                          <form action="{{ route('obras.detalles.store', $obra) }}" method="POST">
                                 @csrf
-                                <div class="info-card">
-                                    <div class="form-group">
-                                        <label class="form-label">Tipo de Detalle</label>
-                                        <select name="type" class="form-select" required>
-                                            <option value="note">Nota</option>
-                                            <option value="progress">Avance</option>
-                                            <option value="issue">Incidencia</option>
-                                            <option value="delivery">Entrega</option>
-                                            <option value="inspection">Inspección</option>
-                                        </select>
+
+                                <div class="info-card space-y-6">
+
+                                    {{-- Tipo de Avance --}}
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Tipo de Avance</label>
+                                            <select name="type" class="form-select" required>
+                                                <option value="Earthworks">1.Earthworks</option>
+                                                <option value="Foundations">2.Foundations</option>
+                                                <option value="Roofing">3.Roofing</option>
+                                                <option value="Enclosures">4.Enclosures / Façades</option>
+                                                <option value="Installations">5.Installations</option>
+                                                <option value="Finishes">6.Finishes</option>
+                                                <option value="Testing">7.Testing and commissioning</option>
+                                                <option value="Handover">8.Handover</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-help">
+                                            Selecciona la etapa de la obra a la que corresponde este avance.
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Título</label>
-                                        <input type="text" name="title" class="form-input" required>
-                                    </div>
+        {{-- Título --}}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Título</label>
+                <input type="text" name="title" class="form-input" required>
+            </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Descripción</label>
-                                        <textarea name="body" rows="3" class="form-textarea" required></textarea>
-                                    </div>
+            <div class="form-help">
+                Describe brevemente el avance realizado (ej. “Excavación inicial”).
+            </div>
+        </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Progreso (%)</label>
-                                        <input type="number" name="progress_pct" class="form-input" min="0" max="100" value="0">
-                                    </div>
+        {{-- Progreso --}}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Progreso (%)</label>
+                <input
+                    type="number"
+                    name="progress_pct"
+                    class="form-input"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+            </div>
 
-                                    <div style="display: flex; gap: 1rem;">
-                                        <button type="submit" class="btn btn-primary">Guardar</button>
-                                        <button type="button" class="btn btn-secondary" onclick="toggleForm('add-detalle-form')">Cancelar</button>
-                                    </div>
-                                </div>
-                            </form>
+            <div class="form-help">
+                Indica el porcentaje de avance estimado de la Obra en general despues de este avance.
+            </div>
+        </div>
+
+        {{-- Botones --}}
+        <div style="display:flex; gap:1rem;">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleForm('add-detalle-form')">
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</form>
+
                         </div>
 
                         {{-- Timeline de detalles --}}
@@ -669,20 +738,29 @@
                                 @foreach($obra->detalles->sortByDesc('created_at') as $detalle)
                                     <div class="timeline-item">
                                         <div class="timeline-date">{{ $detalle->created_at->format('d/m/Y H:i') }}</div>
-                                        <div class="timeline-title">
-                                            {{ $detalle->title }}
-                                            <span class="badge badge-planning">{{ ucfirst($detalle->type) }}</span>
-                                        </div>
+                                       <div class="timeline-title">
+                                        {{ $detalle->title }}
+                                        <span class="badge badge-planning">{{ ucfirst($detalle->type) }}</span>
+                                        <form action="{{ route('obras.detalles.destroy', [$obra, $detalle]) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este detalle?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete-detalle" title="Eliminar detalle">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
                                         <div class="timeline-content">{{ $detalle->body }}</div>
                                         @if($detalle->progress_pct)
                                             <div class="timeline-content" style="margin-top: 0.5rem;">
                                                 <strong>Progreso:</strong> {{ $detalle->progress_pct }}%
+                                                
                                             </div>
                                         @endif
                                         @if($detalle->creador)
-                                            <div class="timeline-content" style="margin-top: 0.25rem; font-size: 12px; color: #9ca3af;">
-                                                Por: {{ $detalle->creador->name }}
-                                            </div>
+                                             <div class="timeline-content" style="margin-top: 0.25rem; font-size: 12px; color: #9ca3af; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Por: {{ $detalle->creador->name }}</span>
+                    </div>
+                                              
                                         @endif
                                     </div>
                                 @endforeach
@@ -718,7 +796,7 @@
 
                                         <div class="form-group">
                                             <label class="form-label">URL de Acceso</label>
-                                            <input type="url" name="url" class="form-input" placeholder="https://..." required>
+                                            <input type="text" name="url" class="form-input" placeholder="https://..." required>
                                         </div>
 
                                         <div class="form-group">
@@ -781,41 +859,7 @@
                         @endif
                     </div>
 
-                    {{-- Tab: Planos --}}
     
-{{-- <div id="tab-planos" class="tab-content">
-    <div class="section-header">
-        <h2 class="section-title">Planos de la Obra</h2>
-        <button class="btn btn-primary" onclick="toggleForm('add-plano-form')">
-            ➕ Agregar Plano
-        </button>
-    </div> --}}
-
-    {{-- Formulario agregar plano --}}
-    {{-- <div id="add-plano-form" style="display: none; margin-bottom: 2rem;">
-        <form action="{{ route('obras.planos.store', $obra) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="info-card">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Archivo</label>
-                        <input type="file" name="archivo" class="form-input" required accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png">
-                        <small style="color: #6b7280; font-size: 12px;">PDF, DWG, DXF, JPG, PNG (Máx. 50MB)</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Descripción</label>
-                        <textarea name="descripcion" rows="3" class="form-textarea"></textarea>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 1rem;">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                    <button type="button" class="btn btn-secondary" onclick="toggleForm('add-plano-form')">Cancelar</button>
-                </div>
-            </div>
-        </form>
-    </div> --}}
     {{-- Tab: Planos --}}
 <div id="tab-planos" class="tab-content">
     <div class="section-header">
@@ -874,9 +918,16 @@
                         <a href="{{ route('obras.planos.download', [$obra, $plano]) }}" class="btn-icon" title="Descargar">
                             💾
                         </a>
-                        <button type="button" class="btn-icon" onclick="deletePlano({{ $plano->id }})" title="Eliminar">
+                        {{-- <button type="button" class="btn-icon" onclick="deletePlano({{ $plano->id }})" title="Eliminar">
                             🗑️
-                        </button>
+                        </button> --}}
+
+               <button type="button"
+                        class="btn-icon"
+                        onclick="deletePlano('{{ route('obras.planos.destroy', [$obra->id, $plano->id]) }}', {{ $plano->id }})"
+                        title="Eliminar">
+                    🗑️
+                </button>
                     </div>
                 </div>
             @endforeach
@@ -884,7 +935,7 @@
             <div class="empty-state" id="planos-empty">
                 <div class="empty-icon">📐</div>
                 <h3>No hay planos registrados</h3>
-                <p>Sube los planos y documentación técnica de la obra</p>
+                <p>Sube Solo el plano principal de la Obra en PDF</p>
             </div>
         @endif
     </div>
@@ -967,23 +1018,25 @@ $(document).ready(function() {
     });
 });
 
-function deletePlano(planoId) {
-    if(!confirm('¿Eliminar este plano?')) return;
-    
+function deletePlano(url, planoId) {
+    if (!confirm('¿Eliminar este plano?')) return;
+
     $.ajax({
-        url: '/obras/{{ $obra->id }}/planos/' + planoId,
+        url: url,
         type: 'DELETE',
         data: {
             _token: '{{ csrf_token() }}'
+            
         },
+        
         success: function(response) {
-            if(response.success) {
+            if (response.success) {
                 showNotification('success', response.message);
+
                 $('#plano-' + planoId).fadeOut(300, function() {
                     $(this).remove();
-                    
-                    // Si no hay más planos, mostrar empty state
-                    if($('#planos-list .list-item').length === 0) {
+
+                    if ($('#planos-list .list-item').length === 0) {
                         $('#planos-list').html(`
                             <div class="empty-state" id="planos-empty">
                                 <div class="empty-icon">📐</div>
@@ -997,9 +1050,11 @@ function deletePlano(planoId) {
         },
         error: function(xhr) {
             var errorMsg = 'Error al eliminar el plano';
-            if(xhr.responseJSON && xhr.responseJSON.message) {
+
+            if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
             }
+
             showNotification('error', errorMsg);
         }
     });
@@ -1152,22 +1207,145 @@ function showNotification(type, message) {
     @endif
 </div>
 
-                    {{-- Tab: Informes --}}
-                    <div id="tab-informes" class="tab-content">
-                        <div class="section-header">
-                            <h2 class="section-title">Informes Semanales</h2>
-                        </div>
-                        <div class="empty-state">
-                            <div class="empty-icon">📊</div>
-                            <h3>Sección en desarrollo</h3>
-                            <p>Funcionalidad de informes próximamente</p>
-                        </div>
+                {{-- Tab: Informes --}}
+<div id="tab-informes" class="tab-content">
+    <div class="section-header">
+        <h2 class="section-title">Informes Semanales</h2>
+        <button class="btn btn-primary" onclick="toggleForm('add-informe-form')">
+            ➕ Agregar Informe
+        </button>
+    </div>
+
+    {{-- Formulario agregar informe --}}
+    <div id="add-informe-form" style="display: none; margin-bottom: 2rem;">
+        <form action="{{ route('obras.informes.store', $obra) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="info-card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Archivo</label>
+                        <input type="file" name="archivo" class="form-input" required accept=".pdf">
+                        <small style="color: #6b7280; font-size: 12px;">PDF (Máx. 50MB)</small>
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Semana</label>
+                        <input
+                            type="number"
+                            name="semana_numero"
+                            class="form-input"
+                            min="1"
+                            max="53"
+                            value="{{ old('semana_numero') }}"
+                            placeholder="Ej. 4"
+                            required
+                        >
+                        <small style="color: #6b7280; font-size: 12px;">Número de semana (1-53)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha inicio</label>
+                        <input type="date" name="fecha_inicio" class="form-input" value="{{ old('fecha_inicio') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha fin</label>
+                        <input type="date" name="fecha_fin" class="form-input" value="{{ old('fecha_fin') }}" required>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Título</label>
+                        <input
+                            type="text"
+                            name="titulo"
+                            class="form-input"
+                            value="{{ old('titulo') }}"
+                            maxlength="255"
+                            placeholder="Ej. Informe semanal - Avance de obra"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Resumen</label>
+                        <textarea
+                            name="resumen"
+                            rows="3"
+                            class="form-textarea"
+                            placeholder="Notas, avances, incidencias, acuerdos..."
+                        >{{ old('resumen') }}</textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleForm('add-informe-form')">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- Lista de informes --}}
+    @if($obra->informes->count() > 0)
+        @foreach($obra->informes as $informe)
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-title">
+                        📊 Semana {{ $informe->semana_numero }} — {{ $informe->titulo }}
+                    </div>
+
+                    <div class="list-item-meta">
+                        {{ $informe->fecha_inicio?->format('d/m/Y') }} →
+                        {{ $informe->fecha_fin?->format('d/m/Y') }}
+                        • Subido por {{ $informe->creador->name ?? 'N/D' }}
+                        • {{ $informe->created_at->format('d/m/Y H:i') }}
+                    </div>
+
+                    @if($informe->resumen)
+                        <div class="list-item-meta" style="margin-top: 0.25rem;">
+                            {{ $informe->resumen }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="list-item-actions">
+                    {{-- Descarga (preferido: route) --}}
+                    <a href="{{ route('obras.informes.download', [$obra, $informe]) }}" class="btn-icon" title="Descargar">
+                        💾
+                    </a>
+
+                    {{-- Alternativa (link directo al storage) si ya expones el archivo: --}}
+                    {{-- @if($informe->tiene_archivo)
+                        <a href="{{ $informe->archivo_url }}" class="btn-icon" title="Ver/Descargar" target="_blank" rel="noopener">
+                            🔗
+                        </a>
+                    @endif --}}
+
+                    <form action="{{ route('obras.informes.destroy', [$obra, $informe]) }}" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-icon" onclick="return confirm('¿Eliminar este informe?')" title="Eliminar">
+                            🗑️
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>No hay informes registrados</h3>
+            <p>Sube el informe semanal en PDF para documentar el avance de la obra</p>
+        </div>
+    @endif
+</div>
+{{-- termina el tab:informes --}}
 
                     {{-- Tab: Fotos --}}
 <div id="tab-fotos" class="tab-content">
     <div class="section-header">
-        <h2 class="section-title">Fotos de la Obra</h2>
+        <h2 class="section-title">Renders de la Obra</h2>
         <button class="btn btn-primary" onclick="toggleForm('add-foto-form')">
             ➕ Agregar Fotos
         </button>
@@ -1236,9 +1414,17 @@ function showNotification(type, message) {
                             <a href="{{ asset('storage/' . $foto->ruta_archivo) }}" download="{{ $foto->nombre_archivo }}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
                                 💾
                             </a>
-                            <button type="button" onclick="deleteFoto({{ $foto->id }})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                            {{-- <button type="button" onclick="deleteFoto({{ $foto->id }})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
                                 🗑️
+                            </button> --}}
+                            <button type="button"
+                            onclick="deleteFoto({{ $foto->id }}, '{{ route('obras.fotos.destroy', [$obra->id, $foto->id]) }}')"
+                            class="btn-icon"
+                            title="Eliminar"
+                            style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                            🗑️
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -1409,6 +1595,9 @@ function showNotification(type, message) {
 
     
 </div>
+<script>
+  const STORAGE_BASE = @json(asset('storage'));
+</script>
 
 <script>
     
@@ -1749,37 +1938,48 @@ $(document).ready(function () {
 // AJAX para Fotos
 $(document).ready(function() {
     // Preview de fotos seleccionadas
-    $('#fotos-input').on('change', function(e) {
-        const files = e.target.files;
-        const previewContainer = $('#preview-container');
-        const fileCount = $('#file-count');
+    // $('#fotos-input').on('change', function(e) {
+    //     const files = e.target.files;
+    //     const previewContainer = $('#preview-container');
+    //     const fileCount = $('#file-count');
         
-        previewContainer.html('');
-        fileCount.text(files.length > 0 ? `${files.length} foto(s) seleccionada(s)` : '');
+    //     previewContainer.html('');
+    //     fileCount.text(files.length > 0 ? `${files.length} foto(s) seleccionada(s)` : '');
         
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = $('<img>').attr('src', e.target.result).css({
-                        'width': '100%',
-                        'height': '100px',
-                        'object-fit': 'cover',
-                        'border-radius': '8px',
-                        'border': '2px solid #e5e7eb'
-                    });
-                    previewContainer.append(img);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    });
+    //     Array.from(files).forEach(file => {
+    //         if (file.type.startsWith('image/')) {
+    //             const reader = new FileReader();
+    //             reader.onload = function(e) {
+    //                 const img = $('<img>').attr('src', e.target.result).css({
+    //                     'width': '100%',
+    //                     'height': '100px',
+    //                     'object-fit': 'cover',
+    //                     'border-radius': '8px',
+    //                     'border': '2px solid #e5e7eb'
+    //                 });
+    //                 previewContainer.append(img);
+    //             }
+    //             reader.readAsDataURL(file);
+    //         }
+    //     });
+    // });
 
     // Submit fotos
     $('#form-foto').on('submit', function(e) {
         e.preventDefault();
+
+         if (selectedFiles.length === 0) {
+                alert('Selecciona al menos una foto');
+                return;
+            }
+
         
         var formData = new FormData(this);
+
+        //   selectedFiles.forEach(file => {
+        //         formData.append('fotos[]', file);
+        //     });
+
         var $btn = $(this).find('button[type="submit"]');
         var $btnText = $btn.find('.btn-text');
         var $btnSpinner = $btn.find('.btn-spinner');
@@ -1803,36 +2003,48 @@ $(document).ready(function() {
                     $('#fotos-empty').remove();
                     
                     // Agregar nuevas fotos a la galería
-                    response.fotos.forEach(function(foto) {
+                 response.fotos.forEach(function(foto) {
+
+  const src = `${STORAGE_BASE}/${foto.ruta_archivo}`;
+  const nombre = (foto.nombre_archivo ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
                         var fotoHtml = `
                             <div class="foto-card" id="foto-${foto.id}" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;">
-                                <div style="position: relative; padding-top: 75%; overflow: hidden; background: #f3f4f6;">
-                                    <img src="/storage/${foto.ruta_archivo}" 
-                                         alt="${foto.nombre_archivo}"
-                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
-                                         onclick="openImageModal('/storage/${foto.ruta_archivo}', '${foto.nombre_archivo}')">
+                            <div style="position: relative; padding-top: 75%; overflow: hidden; background: #f3f4f6;">
+                                <img
+                                src="${src}"
+                                alt="${nombre}"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+                                onclick="openImageModal('${src}', '${nombre}')"
+                                >
+                            </div>
+
+                            <div style="padding: 1rem;">
+                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 0.5rem;">
+                                ${new Date(foto.fecha_captura || foto.created_at).toLocaleDateString('es-MX')}
                                 </div>
-                                <div style="padding: 1rem;">
-                                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 0.5rem;">
-                                        ${new Date(foto.fecha_captura || foto.created_at).toLocaleDateString('es-MX')}
-                                    </div>
-                                    ${foto.descripcion ? `<div style="font-size: 13px; color: #374151; margin-bottom: 0.5rem;">${foto.descripcion}</div>` : ''}
-                                    <div style="font-size: 11px; color: #9ca3af;">
-                                        Por ${foto.uploaded_by.name}
-                                    </div>
-                                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-                                        <a href="/storage/${foto.ruta_archivo}" download="${foto.nombre_archivo}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
-                                            💾
-                                        </a>
-                                        <button type="button" onclick="deleteFoto(${foto.id})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
-                                            🗑️
-                                        </button>
-                                    </div>
+
+                                ${foto.descripcion ? `<div style="font-size: 13px; color: #374151; margin-bottom: 0.5rem;">${foto.descripcion}</div>` : ''}
+
+                                <div style="font-size: 11px; color: #9ca3af;">
+                                Por ${foto.uploaded_by?.name ?? ''}
+                                </div>
+
+                                <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                                <a href="${src}" download="${nombre}" class="btn-icon" title="Descargar" style="flex: 1; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; text-decoration: none;">
+                                    💾
+                                </a>
+                                <button type="button" onclick="deleteFoto(${foto.id})" class="btn-icon" title="Eliminar" style="flex: 1; padding: 0.5rem; background: #fee2e2; border: none; border-radius: 6px; cursor: pointer;">
+                                    🗑️
+                                </button>
                                 </div>
                             </div>
+                            </div>
                         `;
+
                         $('#fotos-gallery').prepend(fotoHtml);
-                    });
+                        });
+
                     
                     // Reset form y cerrar
                     $('#form-foto')[0].reset();
@@ -1857,14 +2069,18 @@ $(document).ready(function() {
     });
 });
 
-function deleteFoto(fotoId) {
+function deleteFoto(fotoId,url) {
     if(!confirm('¿Eliminar esta foto?')) return;
     
     $.ajax({
-        url: '/obras/{{ $obra->id }}/fotos/' + fotoId,
-        type: 'DELETE',
+        url:url,
+        // url: '/works/{{ $obra->id }}/fotos/' + fotoId,
+        // url: '/cubic/public/works/{{ $obra->id }}/fotos/' + fotoId,
+
+        type: 'POST',
         data: {
-            _token: '{{ csrf_token() }}'
+            _token: '{{ csrf_token() }}',
+            _method: 'DELETE'
         },
         success: function(response) {
             if(response.success) {
@@ -1950,8 +2166,64 @@ $(document).on('mouseenter', '.foto-card', function() {
             const form = document.getElementById(formId);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
-    </script>
-    
-   
+   //Borrar imagenes seleccionadas antes de subirlas a guardar
+let selectedFiles = [];
+
+const input = document.getElementById('fotos-input');
+const preview = document.getElementById('preview-container');
+const fileCount = document.getElementById('file-count');
+
+input.addEventListener('change', function () {
+  selectedFiles = Array.from(input.files);
+  renderPreviews();
+});
+
+function renderPreviews() {
+  preview.innerHTML = '';
+  fileCount.textContent = `${selectedFiles.length} foto(s) seleccionada(s)`;
+
+  selectedFiles.forEach((file, index) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const div = document.createElement('div');
+      div.style.position = 'relative';
+
+      div.innerHTML = `
+        <img src="${e.target.result}" style="
+          width:100%;
+          height:100px;
+          object-fit:cover;
+          border-radius:8px;
+        ">
+        <button type="button"
+          onclick="removeFile(${index})"
+          style="
+            position:absolute;
+            top:4px;
+            right:4px;
+            background:#ef4444;
+            color:white;
+            border:none;
+            border-radius:50%;
+            width:22px;
+            height:22px;
+            cursor:pointer;
+          ">✕</button>
+      `;
+
+      preview.appendChild(div);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeFile(index) {
+  selectedFiles.splice(index, 1);
+  renderPreviews();
+}
+</script>
+
 
 </x-app-layout>

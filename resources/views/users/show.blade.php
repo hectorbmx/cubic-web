@@ -195,6 +195,78 @@
             color: #4b5563;
             margin-left: 0.25rem;
         }
+          .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(17,24,39,.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 1rem;
+    }
+    .modal-backdrop.show { display: flex; }
+
+    .modal-card {
+        width: 100%;
+        max-width: 520px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.25);
+        overflow: hidden;
+    }
+    .modal-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .75rem;
+    }
+    .modal-title {
+        font-weight: 700;
+        color: #111827;
+        font-size: 16px;
+    }
+    .modal-close {
+        background: #f3f4f6;
+        border: none;
+        border-radius: 10px;
+        padding: .5rem .75rem;
+        cursor: pointer;
+        font-weight: 600;
+        color: #374151;
+    }
+    .modal-body { padding: 1rem 1.25rem; }
+    .modal-footer {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+    .field-label { display:block; font-size: 13px; font-weight: 600; color:#374151; margin-bottom: .35rem; }
+    .field-select, .field-input {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: .6rem .75rem;
+        font-size: 14px;
+        outline: none;
+        color:black;
+    }
+    .field-select:focus, .field-input:focus {
+        border-color: #f5b800;
+        box-shadow: 0 0 0 3px rgba(252,194,0,.2);
+    }
+    .help-text { font-size: 12px; color:#6b7280; margin-top:.35rem; }
+    .cards-divider {
+    grid-column: 1 / -1; /* ocupa todo el ancho del grid */
+    height: 1px;
+    background: #e5e7eb; /* gris fino */
+    margin: 0.75rem 0 1.25rem 0;
+}
+
     </style>
 
     <div class="user-show-page">
@@ -278,9 +350,13 @@
                                     </li>
                                 @endforeach
                             </ul>
+                            
                         @else
                             <p class="card-subtitle">Este usuario aún no tiene clientes asignados.</p>
                         @endif
+                        <button type="button" class="btn-primary" id="btnOpenClientesModal">
+                            👥 Gestionar clientes
+                        </button>
                     </div>
 
                     {{-- Obras asignadas --}}
@@ -324,8 +400,468 @@
                         </div>
                     </div>
                 </div>
+                {{-- SEGUNDO ROW--}}
+                    <div class="cards-divider"></div>
+<div class="cards-row">
+    {{-- Datos del usuario --}}
+<div class="card">
+    <div class="card-header">
+        <div>
+            <div class="card-title">Datos del usuario</div>
+            <div class="card-subtitle">Ver y editar información básica, rol y clientes asignados.</div>
+        </div>
 
-            </div>
+        <button type="button" class="btn-primary" id="btnOpenUserEditModal">
+            ✏️ Editar
+        </button>
+    </div>
+
+    <div class="list-meta" style="line-height: 1.8;">
+        <div><strong>Nombre:</strong> {{ $user->name }}</div>
+        <div><strong>Email:</strong> {{ $user->email }}</div>
+        <div><strong>Teléfono:</strong> {{ $user->phone ?? '—' }}</div>
+        <div><strong>Rol:</strong> {{ $roleActual ?? 'Sin rol' }}</div>
+        <div>
+            <strong>Clientes:</strong>
+            {{ $user->clientes->isNotEmpty() ? $user->clientes->pluck('name')->join(', ') : '—' }}
         </div>
     </div>
+</div>
+
+    {{--DE AQUI PARA ABAJO EL CARDD CONTRASEÑA--}}
+    {{-- Seguridad --}}
+<div class="card">
+    <div class="card-header">
+        <div>
+            <div class="card-title">Seguridad</div>
+            <div class="card-subtitle">Resetea la contraseña del usuario (acción administrativa).</div>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnOpenResetPassModal">
+            🔐 Resetear contraseña
+        </button>
+    </div>
+
+    <p class="card-subtitle" style="margin-top:.25rem;">
+        Esta acción generará una contraseña temporal. Compártela con el usuario por un canal seguro.
+    </p>
+</div>
+
+</div>
+            </div>
+            
+        </div>
+        
+    </div>
+    {{-- =========================
+     MODAL: RESET PASSWORD
+     ========================= --}}
+<div class="modal-backdrop" id="resetPassModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="resetPassModalTitle">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="resetPassModalTitle">Resetear contraseña</div>
+                <div class="card-subtitle">Se generará una contraseña temporal para {{ $user->email }}.</div>
+            </div>
+            <button type="button" class="modal-close" id="btnCloseResetPassModal">Cerrar</button>
+        </div>
+
+        <div class="modal-body">
+            <div id="resetPassAlert" class="card-subtitle" style="display:none; margin-bottom:.75rem;"></div>
+
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:.75rem;">
+                <div class="list-meta">
+                    Para confirmar, escribe <strong>YES</strong> y presiona "Resetear".
+                </div>
+
+                <div style="margin-top:.5rem;">
+                    <input id="resetConfirmInput" class="field-input" placeholder="YES" />
+                </div>
+            </div>
+
+            <div id="tempPasswordBox" style="display:none; margin-top:1rem;">
+                <label class="field-label">Contraseña temporal</label>
+                <div style="display:flex; gap:.5rem;">
+                    <input id="tempPasswordInput" class="field-input" readonly>
+                    <button type="button" class="btn-secondary" id="btnCopyTempPass">Copiar</button>
+                </div>
+                <div class="help-text">Compártela con el usuario por un canal seguro. Idealmente que la cambie al iniciar sesión.</div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="btnCancelResetPassModal">Cancelar</button>
+            <button type="button" class="btn-primary" id="btnDoResetPass">
+                ⚠️ Resetear
+            </button>
+        </div>
+    </div>
+</div>
+    {{-- =========================
+     MODAL: EDITAR USUARIO
+     ========================= --}}
+<div class="modal-backdrop" id="userEditModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="userEditModalTitle">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="userEditModalTitle">Editar usuario</div>
+                <div class="card-subtitle">Actualiza datos, rol y clientes. Se guardará sin recargar la página.</div>
+            </div>
+            <button type="button" class="modal-close" id="btnCloseUserEditModal">Cerrar</button>
+        </div>
+
+        <form id="formUserUpdate" action="{{ route('users.update', $user) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="modal-body">
+                <div id="userEditAlert" class="card-subtitle" style="display:none; margin-bottom:.75rem;"></div>
+
+                <label class="field-label">Nombre</label>
+                <input name="name" class="field-input" value="{{ $user->name }}" required>
+
+                <div style="margin-top:.75rem;">
+                    <label class="field-label">Email</label>
+                    <input type="email" name="email" class="field-input" value="{{ $user->email }}" required>
+                </div>
+
+                <div style="margin-top:.75rem;">
+                    <label class="field-label">Teléfono</label>
+                    <input name="phone" class="field-input" value="{{ $user->phone ?? '' }}" placeholder="Opcional">
+                </div>
+
+                <div style="margin-top:.75rem;">
+                    <label class="field-label">Rol</label>
+                    <select name="role" class="field-select" id="editRoleSelect" required>
+                        <option value="" disabled {{ !$roleActual ? 'selected' : '' }}>Selecciona un rol</option>
+                        @foreach($roles as $r)
+                            <option value="{{ $r->name }}" {{ $roleActual === $r->name ? 'selected' : '' }}>
+                                {{ $r->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div style="margin-top:.75rem;" id="clientesMultiBlock">
+                    <label class="field-label">Clientes (asignación)</label>
+                    <select name="clientes[]" class="field-select" id="editClientesSelect" multiple size="8">
+                        @foreach($clientesAll as $c)
+                            <option value="{{ $c->id }}"
+                                {{ $clientesAsignadosIds->contains((int)$c->id) ? 'selected' : '' }}>
+                                {{ $c->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="help-text">Para rol "user" debes seleccionar al menos 1 cliente. Para "superadmin" se eliminarán.</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="btnCancelUserEditModal">Cancelar</button>
+                <button type="submit" class="btn-primary" id="btnSaveUserEdit">
+                    💾 Guardar cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{{-- MODAL CASIGNAR CLIENTE --}}
+    <div class="modal-backdrop" id="clientesModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="clientesModalTitle">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="clientesModalTitle">Asignar cliente</div>
+                <div class="card-subtitle">Selecciona un cliente disponible para asignarlo al usuario.</div>
+            </div>
+            <button type="button" class="modal-close" id="btnCloseClientesModal">Cerrar</button>
+        </div>
+
+        <form method="POST" action="{{ route('users.clientes.asignar', $user) }}">
+            @csrf
+
+            <div class="modal-body">
+                <label class="field-label">Cliente</label>
+                <select name="cliente_id" class="field-select" required>
+                    <option value="" selected disabled>Selecciona un cliente</option>
+                    @forelse($clientesDisponibles as $c)
+                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                    @empty
+                        <option value="" disabled>No hay clientes disponibles para asignar</option>
+                    @endforelse
+                </select>
+                <div class="help-text">Solo se muestran clientes que aún no están asignados a este usuario.</div>
+
+                <div style="margin-top: 1rem; display:grid; grid-template-columns: 1fr 1fr; gap: .75rem;">
+                    <div>
+                        <label class="field-label">Rol (pivot)</label>
+                        <input name="role" class="field-input" placeholder="company_admin" value="company_admin">
+                    </div>
+                    <div>
+                        <label class="field-label">Status (pivot)</label>
+                        <input name="status" class="field-input" placeholder="active" value="active">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="btnCancelClientesModal">Cancelar</button>
+                <button type="submit" class="btn-primary" {{ $clientesDisponibles->isEmpty() ? 'disabled' : '' }}>
+                    ✅ Asignar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('clientesModal');
+    const openBtn = document.getElementById('btnOpenClientesModal');
+    const closeBtn = document.getElementById('btnCloseClientesModal');
+    const cancelBtn = document.getElementById('btnCancelClientesModal');
+
+    function openModal() { modal.classList.add('show'); }
+    function closeModal() { modal.classList.remove('show'); }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Cerrar al dar click fuera de la tarjeta
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // ESC para cerrar
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+    });
+})();
+(function () {
+    const modal = document.getElementById('userEditModal');
+    const openBtn = document.getElementById('btnOpenUserEditModal');
+    const closeBtn = document.getElementById('btnCloseUserEditModal');
+    const cancelBtn = document.getElementById('btnCancelUserEditModal');
+
+    const form = document.getElementById('formUserUpdate');
+    const alertBox = document.getElementById('userEditAlert');
+    const saveBtn = document.getElementById('btnSaveUserEdit');
+
+    const roleSelect = document.getElementById('editRoleSelect');
+    const clientesBlock = document.getElementById('clientesMultiBlock');
+
+    function openModal() { modal.classList.add('show'); }
+    function closeModal() {
+        modal.classList.remove('show');
+        hideAlert();
+    }
+
+    function showAlert(type, message) {
+        alertBox.style.display = 'block';
+        alertBox.style.padding = '.6rem .75rem';
+        alertBox.style.borderRadius = '10px';
+        alertBox.style.fontSize = '13px';
+
+        if (type === 'success') {
+            alertBox.style.background = '#ECFDF5';
+            alertBox.style.color = '#065F46';
+            alertBox.style.border = '1px solid #A7F3D0';
+        } else {
+            alertBox.style.background = '#FEF2F2';
+            alertBox.style.color = '#991B1B';
+            alertBox.style.border = '1px solid #FECACA';
+        }
+        alertBox.textContent = message;
+    }
+    function hideAlert() {
+        alertBox.style.display = 'none';
+        alertBox.textContent = '';
+    }
+
+    function syncClientesVisibility() {
+        const role = roleSelect.value;
+        // Si superadmin, ocultamos selección (porque en backend se detacha)
+        if (role === 'superadmin') {
+            clientesBlock.style.display = 'none';
+        } else {
+            clientesBlock.style.display = 'block';
+        }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', function () {
+        syncClientesVisibility();
+        openModal();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+    roleSelect.addEventListener('change', syncClientesVisibility);
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideAlert();
+
+        saveBtn.disabled = true;
+
+        try {
+            const url = form.getAttribute('action');
+            const formData = new FormData(form);
+
+            // Laravel espera PUT/PATCH: ya lo cubres con @method('PUT') en FormData
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            });
+
+            const data = await res.json().catch(() => null);
+
+            if (!res.ok) {
+                // 422 validation, 403, 500
+                if (data && data.message) {
+                    // Si trae errors, mostrarlos en una sola línea breve
+                    if (data.errors) {
+                        const firstKey = Object.keys(data.errors)[0];
+                        const firstMsg = data.errors[firstKey]?.[0];
+                        showAlert('error', firstMsg || data.message);
+                    } else {
+                        showAlert('error', data.message);
+                    }
+                } else {
+                    showAlert('error', 'No se pudo actualizar el usuario.');
+                }
+                saveBtn.disabled = false;
+                return;
+            }
+
+            showAlert('success', data?.message || 'Usuario actualizado exitosamente.');
+
+            // Refrescar vista para ver card actualizado + listas
+            setTimeout(() => window.location.reload(), 650);
+
+        } catch (err) {
+            showAlert('error', 'Error de red al actualizar el usuario.');
+            saveBtn.disabled = false;
+        }
+    });
+})();
+(function () {
+    const modal = document.getElementById('resetPassModal');
+    const openBtn = document.getElementById('btnOpenResetPassModal');
+    const closeBtn = document.getElementById('btnCloseResetPassModal');
+    const cancelBtn = document.getElementById('btnCancelResetPassModal');
+
+    const confirmInput = document.getElementById('resetConfirmInput');
+    const doBtn = document.getElementById('btnDoResetPass');
+
+    const alertBox = document.getElementById('resetPassAlert');
+
+    const tempBox = document.getElementById('tempPasswordBox');
+    const tempInput = document.getElementById('tempPasswordInput');
+    const copyBtn = document.getElementById('btnCopyTempPass');
+
+    function openModal() {
+        modal.classList.add('show');
+        hideAlert();
+        tempBox.style.display = 'none';
+        tempInput.value = '';
+        confirmInput.value = '';
+        doBtn.disabled = false;
+    }
+
+    function closeModal() {
+        modal.classList.remove('show');
+        hideAlert();
+    }
+
+    function showAlert(type, message) {
+        alertBox.style.display = 'block';
+        alertBox.style.padding = '.6rem .75rem';
+        alertBox.style.borderRadius = '10px';
+        alertBox.style.fontSize = '13px';
+
+        if (type === 'success') {
+            alertBox.style.background = '#ECFDF5';
+            alertBox.style.color = '#065F46';
+            alertBox.style.border = '1px solid #A7F3D0';
+        } else {
+            alertBox.style.background = '#FEF2F2';
+            alertBox.style.color = '#991B1B';
+            alertBox.style.border = '1px solid #FECACA';
+        }
+        alertBox.textContent = message;
+    }
+
+    function hideAlert() {
+        alertBox.style.display = 'none';
+        alertBox.textContent = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    doBtn.addEventListener('click', async function () {
+        hideAlert();
+
+        if ((confirmInput.value || '').trim().toUpperCase() !== 'YES') {
+            showAlert('error', 'Confirmación inválida. Escribe YES para continuar.');
+            return;
+        }
+
+        doBtn.disabled = true;
+
+        try {
+            const res = await fetch(@json(route('users.password.reset', $user)), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': @json(csrf_token()),
+                },
+                body: JSON.stringify({ confirm: 'YES' })
+            });
+
+            const data = await res.json().catch(() => null);
+
+            if (!res.ok) {
+                showAlert('error', data?.message || 'No se pudo resetear la contraseña.');
+                doBtn.disabled = false;
+                return;
+            }
+
+            showAlert('success', data?.message || 'Contraseña reseteada.');
+            if (data?.temp_password) {
+                tempBox.style.display = 'block';
+                tempInput.value = data.temp_password;
+            }
+        } catch (e) {
+            showAlert('error', 'Error de red al resetear la contraseña.');
+            doBtn.disabled = false;
+        }
+    });
+
+    copyBtn.addEventListener('click', async function () {
+        const val = tempInput.value || '';
+        if (!val) return;
+
+        try {
+            await navigator.clipboard.writeText(val);
+            showAlert('success', 'Contraseña copiada al portapapeles.');
+        } catch (e) {
+            showAlert('error', 'No se pudo copiar. Copia manualmente.');
+        }
+    });
+})();
+</script>
 </x-app-layout>

@@ -328,6 +328,31 @@
                 font-size: 26px;
             }
         }
+
+        .password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .form-control {
+    padding-right: 40px; /* espacio para el ojo */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #6b7280; /* gris elegante */
+}
+
+.toggle-password:hover {
+    color: #374151;
+}
+
     </style>
 </head>
 <body>
@@ -420,6 +445,14 @@
                 required
                 autocomplete="current-password"
             >
+               <button
+                    type="button"
+                    class="toggle-password"
+                    aria-label="Mostrar contraseña"
+                    onclick="togglePassword()"
+                >
+                    👁️
+                </button>
         </div>
     </div>
 
@@ -445,3 +478,19 @@
     </div>
 </body>
 </html>
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    const btn = document.querySelector('.toggle-password');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈'; // ojo cerrado
+        btn.setAttribute('aria-label', 'Ocultar contraseña');
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️'; // ojo abierto
+        btn.setAttribute('aria-label', 'Mostrar contraseña');
+    }
+}
+</script>

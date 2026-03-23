@@ -15,16 +15,32 @@ class ObraCamaraController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|url',
+            'url' => 'required|string',
             'username' => 'nullable|string|max:255',
             'password' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
         ]);
+    $urlInput = $request->url;
+    $finalUrl = $urlInput;
 
+        if (str_contains($urlInput, '<iframe')) {
+        preg_match('/src="([^"]+)"/', $urlInput, $match);
+        $finalUrl = $match[1] ?? $urlInput;
+    } 
+    // SI EL USUARIO PEGA EL SCRIPT DE PANOMAX: 
+    // No podemos "convertir" el script a URL fácilmente, 
+    // lo ideal es avisarle o usar una URL conocida de Panomax.
+    elseif (str_contains($urlInput, '<script')) {
+        // Opción A: Extraer el ID de instancia y construir la URL si es Panomax
+        if (preg_match('/instance:\s*(\d+)/', $urlInput, $instanceMatch)) {
+            // Nota: Verifica si esta estructura de URL funciona para todos tus casos de Panomax
+            $finalUrl = "https://static.panomax.com/front/thumbnail/index.html?instance=" . $instanceMatch[1];
+        }
+    }
         ObraCamara::create([
             'obra_id' => $obra->id,
             'name' => $request->name,
-            'url' => $request->url,
+            'url' => $finalUrl,
             'username' => $request->username,
             'password' => $request->password, // Se encripta automáticamente en el modelo
             'notes' => $request->notes,

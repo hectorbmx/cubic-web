@@ -122,6 +122,9 @@ return [
     */
 
     'key' => env('APP_KEY'),
+    'app_reset_url' => env('APP_RESET_URL', ''),
+    
+
 
     'cipher' => 'AES-256-CBC',
 

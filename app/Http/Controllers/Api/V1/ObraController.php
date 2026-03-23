@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Obra;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class ObraController extends Controller
 {
@@ -62,7 +65,7 @@ class ObraController extends Controller
             'planos',
             'contratos',
             'fotos',
-            'informes'
+            'informes',
         ]);
 
         return response()->json([
@@ -80,6 +83,7 @@ class ObraController extends Controller
                 'lng' => $obra->lng,
                 'presupuesto' => $obra->budget_amount,
                 'moneda' => $obra->currency,
+                'cover_image' => $obra->cover_image,
                 
                 // Cliente
                 'cliente' => [
@@ -100,7 +104,8 @@ class ObraController extends Controller
                     return [
                         'id' => $detalle->id,
                         'titulo' => $detalle->title ?? $detalle->nombre ?? '',
-                        'descripcion' => $detalle->description ?? $detalle->descripcion ?? '',
+                        'descripcion' => $detalle->body ?? $detalle->body ?? '',
+                        'progress' => $detalle->progress_pct ?? $detalle->progress_pct ?? '',
                         'fecha' => $detalle->created_at->format('Y-m-d H:i:s'),
                     ];
                 }),
@@ -111,30 +116,70 @@ class ObraController extends Controller
                         'id' => $camara->id,
                         'nombre' => $camara->name ?? $camara->nombre ?? '',
                         'url' => $camara->url ?? $camara->stream_url ?? '',
+                        
                         'activa' => $camara->is_active ?? true,
                     ];
                 }),
                 
                 // Planos
-                'planos' => $obra->planos->map(function ($plano) {
-                    return [
-                        'id' => $plano->id,
-                        'nombre' => $plano->name ?? $plano->nombre ?? '',
-                        'url' => $plano->file_path ?? $plano->url ?? '',
-                        'fecha' => $plano->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
+                // 'planos' => $obra->planos->map(function ($plano) {
+                //     return [
+                //         'id' => $plano->id,
+                //         'nombre' => $plano->name ?? $plano->nombre ?? '',
+                //         'url' => $plano->file_path ?? $plano->url ?? '',
+                //         'url' => $plano ? url(Storage::disk('public')->url($file_path)) : '',
+
+                //         'fecha' => $plano->created_at->format('Y-m-d'),
+                //     ];
+                // }),
+             'planos' => $obra->planos->map(function ($plano) {
+    // 1. Obtenemos el path relativo (ej: "planos/10/archivo.pdf")
+    // Usamos el campo que contenga solo el nombre/ruta del archivo, NO la url completa.
+    $path = $plano->file_path ?? $plano->archivo_path ?? $plano->url ?? null;
+
+    // Limpiamos el path por si acaso viene con la URL completa de la base de datos
+    // Esto evita que se concatene doble si en la BD ya decía "https://..."
+    if (str_contains($path, 'http')) {
+        $path = str_replace(url(Storage::disk('public')->url('')), '', $path);
+        $path = ltrim($path, '/');
+    }
+
+    return [
+        'id'     => $plano->id,
+        'nombre' => $plano->name ?? $plano->nombre ?? '',
+        
+        // OPCIÓN A: Si quieres que Laravel lo maneje (Recomendado)
+        'url'    => $path ? asset('storage/' . $path) : '',
+        
+        // OPCIÓN B: Si necesitas FORZAR el "/public/" como pediste al inicio:
+        // 'url' => $path ? "https://www.bmxmexico.com/cubic/public/storage/" . $path : '',
+
+        'fecha'  => $plano->created_at ? $plano->created_at->format('Y-m-d') : '',
+    ];
+}),
+                                    
                 // Contratos
-                'contratos' => $obra->contratos->map(function ($contrato) {
-                    return [
-                        'id' => $contrato->id,
-                        'nombre' => $contrato->name ?? $contrato->nombre ?? '',
-                        'url' => $contrato->file_path ?? $contrato->url ?? '',
-                        'fecha' => $contrato->created_at->format('Y-m-d'),
-                    ];
-                }),
-                
+              'contratos' => $obra->contratos->map(function ($contrato) {
+                        // Aquí asumo que file_path guarda algo como "contratos/7/xxx.pdf"
+                        $path = $contrato->file_path ?: null;
+
+                        // Si en tu DB ya tienes una url absoluta en $contrato->url, la respetamos
+                        $absolute = $contrato->url && preg_match('/^https?:\/\//i', $contrato->url);
+
+                        return [
+                            'id' => $contrato->id,
+                            'nombre' => $contrato->name ?? $contrato->nombre ?? '',
+                            'file_path' => $path ?? '',
+
+                            // ✅ Siempre una URL lista para abrir
+                            'url' => $absolute
+                                ? $contrato->url
+                                : ($path ? url(Storage::disk('public')->url($path)) : ''),
+
+                            'fecha' => optional($contrato->created_at)->format('Y-m-d') ?? '',
+                        ];
+                    }),
+                                    
                 // Fotos
                 'fotos' => $obra->fotos->map(function ($foto) {
                      $baseUrl = config('app.url'); 
@@ -148,12 +193,30 @@ class ObraController extends Controller
                 }),
                 
                 // Informes
-                'informes' => $obra->informes->map(function ($informe) {
-                    return [
-                        'id' => $informe->id,
-                        'titulo' => $informe->title ?? $informe->titulo ?? '',
-                        'fecha' => $informe->week_start ?? $informe->fecha ?? $informe->created_at->format('Y-m-d'),
-                        'progreso' => $informe->progress_pct ?? 0,
+               'informes' => $obra->informes->map(function ($informe) {
+                        $path = $informe->archivo_path ?: null;
+
+                        return [
+                            'id' => $informe->id,
+                            'semana' => $informe->semana_numero ?? '',
+                            'fecha_inicio' => $informe->fecha_inicio?->format('Y-m-d') ?? '',
+                            'fecha_fin' => $informe->fecha_fin?->format('Y-m-d') ?? '',
+                            'titulo' => $informe->titulo ?? '',
+                            'resumen' => $informe->resumen ?? '',
+                            'archivo_path' => $path ?? '',
+
+                            // ✅ URL pública absoluta (https://.../cubic/storage/...)
+                            'url' => $path ? url(Storage::disk('public')->url($path)) : '',
+                        ];
+                    }),
+                'personas' => $obra->personas->map(function ($persona){
+                    return[
+                        'id'     => $persona->id,
+                        'nombre' => $persona->nombre_completo,
+                        'rol'    => $persona->rol_empresa,
+                        'celular'=> $persona->celular,
+                        'email'  => $persona->email,
+
                     ];
                 }),
             ]
@@ -162,9 +225,10 @@ class ObraController extends Controller
  public function byCliente(Request $request, $clienteId)
     {
         $user = $request->user();
-
     
-        $isSuperAdmin = $user?->role === 'superadmin';
+        // $isSuperAdmin = $user?->role === 'superadmin';
+        $isSuperAdmin = $user && $user->hasRole('superadmin');
+
         $assignedClientIds = $user?->clientes()->pluck('clientes.id')->toArray() ?? [];
 
         if (!$isSuperAdmin && !in_array((int)$clienteId, $assignedClientIds, true)) {

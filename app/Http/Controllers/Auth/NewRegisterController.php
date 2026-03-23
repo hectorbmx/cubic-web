@@ -20,7 +20,6 @@ class NewRegisterController extends Controller
     {
         $request->validate([
             'email'    => ['required','email'],
-            // 'name'     => ['required','string','max:255'],
             'password' => ['required','confirmed','min:8'],
         ], [
             'email.required' => 'Ingresa tu correo.',

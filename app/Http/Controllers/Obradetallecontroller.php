@@ -15,18 +15,16 @@ class ObraDetalleController extends Controller
     public function store(Request $request, Obra $obra)
     {
         $request->validate([
-            'type' => 'required|in:note,progress,issue,delivery,inspection',
+            'type' => 'required|in:Earthworks,Foundations,Roofing,Enclosures,Installations,Finishes,Testing,Handover,progress',
             'title' => 'required|string|max:255',
-            'body' => 'required|string',
             'progress_pct' => 'nullable|integer|min:0|max:100',
         ]);
-
         $detalle = ObraDetalle::create([
             'obra_id' => $obra->id,
             'created_by' => Auth::id(),
             'type' => $request->type,
             'title' => $request->title,
-            'body' => $request->body,
+            // 'body' => $request->body,
             'progress_pct' => $request->progress_pct ?? 0,
         ]);
 

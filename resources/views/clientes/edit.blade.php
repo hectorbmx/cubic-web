@@ -448,11 +448,21 @@
                 </form>
 
                 {{-- Formulario de eliminación oculto --}}
-                @if(auth()->user()->isSuperAdmin())
-                    <form id="delete-form" action="{{ route('clientes.destroy', $cliente) }}" method="POST" style="display: none;">
+              @if(auth()->user()->isSuperAdmin())
+                    <button type="button" onclick="confirmDelete()">Eliminar cliente</button>
+
+                    <form id="delete-form" action="{{ route('clientes.destroy', $cliente) }}" method="POST" style="display:none;">
                         @csrf
                         @method('DELETE')
                     </form>
+
+                    <script>
+                        function confirmDelete() {
+                            if (confirm('¿Seguro que deseas eliminar este cliente?')) {
+                                document.getElementById('delete-form').submit();
+                            }
+                        }
+                    </script>
                 @endif
             </div>
         </div>
