@@ -67,5 +67,8 @@ class Kernel extends HttpKernel
         'profile.complete' => \App\Http\Middleware\EnsureProfileIsComplete::class,
         'cliente.access' => \App\Http\Middleware\EnsureUserHasClienteAccess::class,
         'api.role' => \App\Http\Middleware\EnsureApiRole::class,
+        'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
     ];
 }

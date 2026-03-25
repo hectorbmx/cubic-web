@@ -15,6 +15,7 @@ use App\Http\Controllers\ObraPersonaController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ObraInformeController;
 use App\Http\Controllers\PrivacyPolicyController;
+use App\Http\Controllers\Admin\RolePermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,10 +37,18 @@ Route::post('/invitation/{token}', [App\Http\Controllers\InvitationController::c
 
 // Rutas de autenticación de Laravel
 require __DIR__.'/auth.php';
-
-
+//rutas para administrar roles y permisos
+Route::middleware(['auth', 'role:superadmin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/roles', [RolePermissionController::class, 'index'])->name('roles.index');
+        Route::post('/permissions', [RolePermissionController::class, 'storePermission'])->name('permissions.store');
+        Route::post('/roles/sync-permissions', [RolePermissionController::class, 'syncRolePermissions'])->name('roles.sync-permissions');
+    });
 // ========== RUTAS AUTENTICADAS ==========
-Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
+// Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
+Route::middleware(['auth', 'verified', 'profile.complete', 'permission:acceso.web'])->group(function () {
     
     // ---------- DASHBOARD ----------
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
