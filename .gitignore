@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /dist/
+/vendor/
 /vendor
 .env
 .env.backup
@@ -17,4 +18,4 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-".env" 
+".env"

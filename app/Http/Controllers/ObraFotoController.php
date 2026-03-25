@@ -97,13 +97,16 @@ public function store(Request $request, Obra $obra)
         ], 422);
 
     } catch (\Throwable $e) {
-        report($e);
+    report($e);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Error al subir las fotos',
-        ], 500);
-    }
+    return response()->json([
+        'success' => false,
+        'message' => 'Error al subir las fotos',
+        'error' => $e->getMessage(),
+        'line' => $e->getLine(),
+        'file' => $e->getFile(),
+    ], 500);
+}
 }
 
     // public function store(Request $request, Obra $obra)

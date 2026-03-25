@@ -131,21 +131,21 @@ public function store(Request $request)
         }
 
         // Generar token de invitación
+        // TODO: usar token cuando implementemos activación segura en app
+
         $token = $user->generateInvitationToken();
 
         // Enviar email de invitación (descomenta cuando esté configurado)
         // Mail::to($user->email)->send(new UserInvitation($user, $token));
         
-        \Log::info('Invitación de usuario generada', [
-            'user' => $user->email,
-            'role' => $request->role,
-            'clientes' => $request->clientes ?? [],
-            'token' => $token,
-            'url' => route('invitation.show', ['token' => $token])
-        ]);
+        \Log::info('Usuario invitado (flujo mobile)', [
+                'user' => $user->email,
+                'role' => $request->role,
+                'clientes' => $request->clientes ?? [],
+            ]);
 
         DB::commit();
-
+        event(new \App\Events\UserInvited($user, $request->role));
         return response()->json([
             'success' => true,
             'message' => 'Usuario creado exitosamente. Se ha enviado una invitación al correo electrónico.'
