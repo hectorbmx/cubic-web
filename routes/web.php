@@ -48,7 +48,7 @@ Route::middleware(['auth', 'role:superadmin'])
     });
 // ========== RUTAS AUTENTICADAS ==========
 // Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
-Route::middleware(['auth', 'verified', 'profile.complete', 'permission:acceso.web'])->group(function () {
+Route::middleware(['auth', 'verified', 'profile.complete', 'permission:acceso-web'])->group(function () {
     
     // ---------- DASHBOARD ----------
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
